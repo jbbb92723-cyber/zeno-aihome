@@ -201,6 +201,27 @@ export default async function ResourcesPage() {
           })}
         </div>
 
+        {/* 工具入口 */}
+        <div className="mt-12 pt-8 border-t border-border">
+          <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-5">
+            在线工具
+          </p>
+          <Link
+            href="/tools/md2wechat"
+            className="group flex items-start justify-between gap-4 border border-border bg-surface p-5 hover:bg-surface-warm transition-colors"
+          >
+            <div>
+              <p className="text-sm font-semibold text-ink group-hover:text-stone transition-colors">
+                Markdown 微信排版工具
+              </p>
+              <p className="text-xs text-ink-muted mt-1.5 leading-relaxed">
+                把 Markdown 文稿一键转成微信公众号排版，可以直接复制 HTML 粘贴到公众号后台。免费使用，无需登录。
+              </p>
+            </div>
+            <span className="text-stone text-sm shrink-0 mt-0.5">→</span>
+          </Link>
+        </div>
+
         {/* 底部 CTA */}
         <div className="mt-14 pt-8 border-t border-border flex flex-wrap gap-3">
           <p className="w-full text-sm text-ink-muted mb-2">

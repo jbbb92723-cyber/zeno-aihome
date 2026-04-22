@@ -5,13 +5,14 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 const navLinks = [
-  { href: '/', label: '首页' },
-  { href: '/about', label: '关于我' },
-  { href: '/blog', label: '文章' },
-  { href: '/topics', label: '专题' },
+  { href: '/',          label: '首页' },
+  { href: '/about',     label: '关于我' },
+  { href: '/blog',      label: '文章' },
+  { href: '/topics',    label: '专题' },
   { href: '/resources', label: '资料库' },
-  { href: '/services', label: '服务' },
-  { href: '/contact', label: '联系' },
+  { href: '/services',  label: '服务' },
+  { href: '/contact',   label: '联系' },
+  { href: '/tools/md2wechat', label: '排版' },
 ]
 
 export default function Header() {

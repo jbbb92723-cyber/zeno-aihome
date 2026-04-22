@@ -36,6 +36,7 @@ export default function Md2WechatToolClient({
   imagePrice,
 }: Props) {
   // ─── 输入状态 ─────────────────────────────────────────────────
+  const [title, setTitle]           = useState('')
   const [markdown, setMarkdown]     = useState('')
   const [theme, setTheme]           = useState('default')
   const [fontSize, setFontSize]     = useState('medium')
@@ -148,14 +149,19 @@ export default function Md2WechatToolClient({
       setDraftMsg('请先输入文章内容。')
       return
     }
+    if (!title.trim()) {
+      setDraftMsg('请先填写文章标题再推送草稿。')
+      return
+    }
     setPushDraft(true)
     setDraftMsg('')
 
     try {
-      const res = await fetch('/api/md2wechat/draft', {
+      const res = await fetch('/api/wechat/draft', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({
+          title: title.trim(),
           markdown,
           theme,
           fontSize,
@@ -218,12 +224,26 @@ export default function Md2WechatToolClient({
             </div>
           </div>
 
+          {/* 标题 */}
+          <div>
+            <label className="text-[0.65rem] text-ink-faint uppercase tracking-widest font-semibold block mb-1.5">
+              文章标题
+            </label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="填写标题（左侧可空，推送草稿时必填）"
+              className="w-full border border-border bg-surface text-sm text-ink px-4 py-2 focus:outline-none focus:ring-1 focus:ring-stone/30 placeholder:text-ink-faint"
+            />
+          </div>
+
           {/* Markdown 输入 */}
           <textarea
             value={markdown}
             onChange={(e) => setMarkdown(e.target.value)}
             placeholder="在此输入 Markdown 内容…"
-            rows={18}
+            rows={16}
             className="w-full border border-border bg-surface text-sm text-ink font-mono leading-relaxed px-4 py-3 resize-y focus:outline-none focus:ring-1 focus:ring-stone/30 placeholder:text-ink-faint"
           />
 
@@ -295,7 +315,7 @@ export default function Md2WechatToolClient({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
-            {/* 生成封面图 */}
+            {/* AI 配图 */}
             <div className="border border-border bg-surface p-5 space-y-3">
               <div className="flex items-center gap-2">
                 <p className="text-sm font-medium text-ink">AI 配图</p>
@@ -303,23 +323,32 @@ export default function Md2WechatToolClient({
               </div>
               <p className="text-xs text-ink-faint font-mono">{imageModel}</p>
               <p className="text-xs text-ink-muted leading-relaxed">
-                当前模型：{imageModel}。预估成本 ¥{imagePrice} / 张，实际费用以火山控制台为准。
+                预估成本 ¥{imagePrice} / 张，实际费用以火山控制台为准。
               </p>
               {!isImageConfigured && (
                 <p className="text-xs text-amber-600">火山引擎图片生成 API 尚未配置</p>
               )}
-              <button
-                onClick={handleGenerateImage}
-                disabled={genImage || !isImageConfigured}
-                className="text-sm text-stone border border-stone/40 px-4 py-2 hover:bg-stone-pale transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-              >
-                {genImage ? '生成中…' : '生成封面图'}
-              </button>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => handleGenerateImage('cover')}
+                  disabled={genImage || !isImageConfigured}
+                  className="text-sm text-stone border border-stone/40 px-4 py-2 hover:bg-stone-pale transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {genImage ? '生成中…' : '生成封面图'}
+                </button>
+                <button
+                  onClick={() => handleGenerateImage('inline')}
+                  disabled={genImage || !isImageConfigured}
+                  className="text-sm text-stone border border-stone/40 px-4 py-2 hover:bg-stone-pale transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {genImage ? '生成中…' : '生成文中配图'}
+                </button>
+              </div>
               {imageMsg && <p className="text-xs text-ink-muted">{imageMsg}</p>}
               {imageUrl && (
                 <img
                   src={imageUrl}
-                  alt="封面图预览"
+                  alt="配图预览"
                   className="w-full max-w-xs border border-border"
                 />
               )}
@@ -353,6 +382,16 @@ export default function Md2WechatToolClient({
           </p>
         </div>
       )}
+
+      {/* 配置检查入口 */}
+      <div className="pt-4 border-t border-border">
+        <a
+          href="/tools/md2wechat/status"
+          className="text-xs text-ink-faint hover:text-ink-muted transition-colors underline underline-offset-2"
+        >
+          配置状态检查 →
+        </a>
+      </div>
     </div>
   )
 }

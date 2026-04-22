@@ -8,6 +8,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+import { isAdminUser } from '@/lib/admin'
 
 // ─── 类型 ──────────────────────────────────────────────────────
 interface DraftRequestBody {
@@ -18,18 +19,14 @@ interface DraftRequestBody {
   fontSize?: string
 }
 
-// ─── 管理员 Token 校验 ──────────────────────────────────────────
-function verifyAdminToken(request: NextRequest): boolean {
-  const token = request.headers.get('x-admin-token')
-  const expected = process.env.ADMIN_TOKEN
-  if (!expected) return false
-  return token === expected
-}
-
 export async function POST(request: NextRequest) {
-  // 校验管理员身份
-  if (!verifyAdminToken(request)) {
-    return NextResponse.json({ error: '未授权，请检查 ADMIN_TOKEN' }, { status: 401 })
+  // 校验管理员身份（基于 session，与图片生成接口一致）
+  const admin = await isAdminUser()
+  if (!admin) {
+    return NextResponse.json(
+      { error: '无权限。草稿推送接口仅限管理员使用。' },
+      { status: 403 },
+    )
   }
 
   // 检查必要环境变量
