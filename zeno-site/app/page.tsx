@@ -28,7 +28,6 @@ export default function HomePage() {
       {/* ───────────────── Hero ───────────────── */}
       <section className="py-12 sm:py-16 border-b border-border">
         <Container size="reading">
-          <p className="text-[0.65rem] text-red-500 mb-2">【视觉回滚测试：2026-04-22】</p>
           <p className="text-[0.7rem] font-semibold tracking-[0.1em] uppercase text-stone mb-5">Zeno</p>
           <h1 className="text-[1.625rem] sm:text-[1.875rem] md:text-[2.25rem] font-semibold leading-[1.3] tracking-[-0.02em] text-ink mb-5 max-w-xl">
             从装修出发，<br />

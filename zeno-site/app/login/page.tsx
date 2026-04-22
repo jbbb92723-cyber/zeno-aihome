@@ -13,8 +13,8 @@ import { redirect } from 'next/navigation'
 import Container from '@/components/Container'
 
 export const metadata: Metadata = {
-  title: '登录',
-  description: '登录赞诺内容母站，领取专属资料，参与内容交流。',
+  title: '社区账号登录',
+  description: '使用 IDC Flare 社区账号登录 Zeno AI Home，领取资料、发表评论。',
   robots: { index: false },
 }
 
@@ -54,12 +54,13 @@ export default async function LoginPage({
       <div className="max-w-sm mx-auto">
         {/* 标题区 */}
         <div className="mb-10">
-          <p className="page-label mb-3">账号登录</p>
+          <p className="page-label mb-3">社区账号通行证</p>
           <h1 className="text-2xl font-semibold text-ink tracking-tight">
-            登录赞诺
+            社区账号登录
           </h1>
           <p className="text-sm text-ink-muted mt-3 leading-relaxed">
-            登录后可以领取资料、发表评论，后续还将支持会员专属内容。
+            如果你已经是 IF / IDC Flare 社区用户，后续可以直接用社区账号进入 Zeno AI Home。
+            公开内容不需要登录，登录只是为了资料领取、评论和后续会员权限。
           </p>
         </div>
 
@@ -93,7 +94,7 @@ export default async function LoginPage({
           ) : (
             <div className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border/50 bg-surface-warm text-sm text-ink-faint cursor-not-allowed">
               <span className="text-stone/50 font-semibold">IDC</span>
-              <span>IDC Flare 登录（待配置）</span>
+              <span>使用 IDC Flare 登录（待配置）</span>
             </div>
           )}
 
@@ -108,12 +109,15 @@ export default async function LoginPage({
         {/* 说明文字 */}
         <div className="mt-10 pt-6 border-t border-border">
           <p className="text-xs text-ink-faint leading-relaxed">
-            登录即表示你同意赞诺的内容使用说明。
-            我不会向第三方出售你的信息，也不会发送垃圾邮件。
+            当前登录功能正在配置中。网站公开内容可以直接阅读，不需要登录。
+            等 IDC Flare OAuth 配置完成后，社区用户可以直接使用原账号进入本站。
+          </p>
+          <p className="text-xs text-ink-faint mt-3 leading-relaxed">
+            我不会要求你重新注册一套网站账号，也不会向第三方出售你的信息。
           </p>
           {!isIdcFlareConfigured && (
             <p className="text-xs text-amber-600 mt-3 leading-relaxed">
-              ⚠ 当前登录功能尚未配置完成，请联系管理员。
+              当前登录功能还在配置中。
             </p>
           )}
         </div>

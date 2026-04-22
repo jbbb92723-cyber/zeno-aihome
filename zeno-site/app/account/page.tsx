@@ -8,23 +8,41 @@
 
 import type { Metadata } from 'next'
 import { auth, signOut } from '@/auth'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Avatar from '@/components/Avatar'
 import Container from '@/components/Container'
 
 export const metadata: Metadata = {
-  title: '用户中心',
-  description: '管理你的账号、已领取资料和订单。',
+  title: '账号中心',
+  description: '社区登录状态、已领取资料和使用记录。',
   robots: { index: false },
 }
 
 export default async function AccountPage() {
   const session = await auth()
 
-  // 未登录：跳转到登录页
+  // 未登录：显示说明页，不强制跳转
   if (!session?.user) {
-    redirect('/login?callbackUrl=/account')
+    return (
+      <Container size="content" className="py-section">
+        <div className="max-w-sm mx-auto">
+          <div className="mb-10">
+            <p className="page-label mb-3">账号中心</p>
+            <h1 className="text-2xl font-semibold text-ink tracking-tight">账号中心</h1>
+          </div>
+          <p className="text-sm text-ink-muted leading-relaxed mb-8">
+            这里用于显示你的社区登录状态、已领取资料、评论记录和会员权限。
+            当前 IDC Flare 登录还在配置中，公开内容可以直接阅读，不需要登录。
+          </p>
+          <Link
+            href="/login"
+            className="inline-block text-sm font-medium text-paper bg-stone px-4 py-2 hover:bg-stone/85 transition-colors"
+          >
+            前往登录页
+          </Link>
+        </div>
+      </Container>
+    )
   }
 
   const user = session.user
@@ -54,8 +72,8 @@ export default async function AccountPage() {
 
         {/* 页面标题 */}
         <div className="mb-10">
-          <p className="page-label mb-3">我的账号</p>
-          <h1 className="text-2xl font-semibold text-ink tracking-tight">用户中心</h1>
+          <p className="page-label mb-3">账号中心</p>
+          <h1 className="text-2xl font-semibold text-ink tracking-tight">账号中心</h1>
         </div>
 
         {/* 用户信息卡片 */}
@@ -115,10 +133,7 @@ export default async function AccountPage() {
               会员状态
             </p>
             <p className="text-sm text-ink-muted leading-relaxed">
-              你当前是注册用户，尚未开通会员。
-            </p>
-            <p className="text-xs text-ink-faint mt-2">
-              会员功能正在建设中，开放后将在此处通知。
+              暂未开放。
             </p>
           </div>
         )}
@@ -126,10 +141,10 @@ export default async function AccountPage() {
         {(user.role === 'member' || user.role === 'customer') && (
           <div className="border border-amber-200 bg-amber-50/50 p-5 mb-8">
             <p className="text-xs text-amber-600 uppercase tracking-widest font-semibold mb-2">
-              会员专属
+              会员状态
             </p>
             <p className="text-sm text-ink-muted leading-relaxed">
-              会员资料和专属内容已解锁，前往资料库领取。
+              已领取资料和评论记录待接入。
             </p>
           </div>
         )}
