@@ -111,30 +111,32 @@ export default function Md2WechatToolClient({
     }
   }
 
-  // ─── 生成封面图（管理员）────────────────────────────────────────
-  async function handleGenerateImage() {
+  // ─── 生成配图（管理员）────────────────────────────────────────
+  async function handleGenerateImage(usage: 'cover' | 'inline' = 'cover') {
     if (!markdown.trim()) {
       setImageMsg('请先输入文章内容，再生成配图。')
       return
     }
     setGenImage(true)
     setImageMsg('')
-    setImageUrl('')
+    if (usage === 'cover') setImageUrl('')
 
-    const prompt = `为微信公众号文章生成封面图。文章风格：极简克制，个人写作站。内容摘要：${markdown.slice(0, 200)}`
+    const prompt = usage === 'cover'
+      ? `为微信公众号文章生成封面图。标题：${title || '(无标题)'}。文章风格：极简克制，个人写作站。`
+      : `为微信公众号文章生成文中配图。内容摘要：${markdown.slice(0, 200)}`
 
     try {
       const res = await fetch('/api/images/generate', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ prompt, usage: 'cover' }),
+        body:    JSON.stringify({ prompt, usage }),
       })
       const data = await res.json()
       if (!res.ok || data.error) {
         setImageMsg(data.error ?? '图片生成失败。')
       } else {
         setImageUrl(data.imageUrl ?? '')
-        setImageMsg(`生成成功，预计费用约 ¥${data.estimatedCost ?? 0.22}。`)
+        setImageMsg(`生成成功，预计费用约 ¥${data.estimatedCost ?? imagePrice}。`)
       }
     } catch {
       setImageMsg('网络错误，请重试。')
