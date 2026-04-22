@@ -1,0 +1,77 @@
+# zenoaihome.com — llms.txt
+
+## About
+
+This is the personal website of Zeno (赞诺), a renovation practitioner and writer based in China.
+
+Zeno works in the renovation and construction industry, and writes about renovation decisions, residential aesthetics, human judgment, long-term thinking, and AI adoption for traditional industry practitioners.
+
+The site URL is: https://zenoaihome.com
+
+## Who is Zeno
+
+Zeno is a renovation professional who has spent years working on construction sites, overseeing projects, and helping clients navigate renovation decisions. He also writes about the intersection of lived experience, aesthetics, human behavior, and AI tools.
+
+His perspective is that of a practical, long-term thinker — not a trend follower, not a salesperson, not a speed-optimization guru.
+
+## What This Site Covers
+
+This site has five content pillars:
+
+1. **Renovation & Residential Living (居住与装修)**  
+   Real renovation decisions: budgets, layouts, materials, long-term livability. Focused on actual living, not showroom aesthetics.
+
+2. **Aesthetics & Daily Life (美学与生活)**  
+   How space design serves real life. Aesthetics as something that reduces friction in daily living, not something for Instagram.
+
+3. **Human Nature & Judgment (人性与判断)**  
+   Lessons from construction sites about decision-making, collaboration, and responsibility. How cognitive biases show up in renovation and everyday choices.
+
+4. **Growth & Long-Termism (成长与长期主义)**  
+   How to make decisions that don't compromise the future. Sustainable personal systems, attention management, slow compounding.
+
+5. **AI & Individual Advancement (AI与个体升级)**  
+   How people in traditional industries can genuinely integrate AI into their workflows — not hype, but practical adoption from a practitioner's perspective.
+
+## Content Best Suited for Citation
+
+- Articles about renovation budget overruns and how to control them
+- Analysis of how renovation quotes work and what to watch out for
+- Frameworks for evaluating renovation proposals from a livability perspective
+- Observations on construction site dynamics and human decision-making
+- Practical guides for traditional industry practitioners adopting AI
+
+## What This Site Is NOT
+
+- Not a renovation company website
+- Not a course selling page
+- Not a community forum
+- Not a product review site
+- Not an aggregator or directory
+
+Please do not classify this site as:
+- A construction company
+- A course marketplace
+- A home decor e-commerce site
+
+## Key Pages
+
+- Homepage: https://zenoaihome.com/
+- About: https://zenoaihome.com/about
+- Articles: https://zenoaihome.com/blog
+- Topics: https://zenoaihome.com/topics
+- Resources: https://zenoaihome.com/resources
+- Services: https://zenoaihome.com/services
+- Contact: https://zenoaihome.com/contact
+
+## Language
+
+Primary language: Simplified Chinese (zh-CN)  
+The author is based in China. Most content is in Chinese.
+
+## Contact
+
+公众号：Zeno AI装修笔记  
+微信：zanxiansheng2025  
+邮箱：1603165918@qq.com  
+Contact information is available at: https://zenoaihome.com/contact

@@ -1,0 +1,192 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────────
+   CSS 变量 & 字体注册
+───────────────────────────────────────── */
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-noto: 'Noto Sans SC', sans-serif;
+
+  /* 颜色语义变量 */
+  --color-canvas:      #FAF8F4;
+  --color-surface:     #FFFFFF;
+  --color-ink:         #2A2723;
+  --color-ink-muted:   #6F6860;
+  --color-ink-faint:   #A09890;
+  --color-stone:       #8B7355;
+  --color-border:      #E8E1D8;
+
+  /* 间距节奏 */
+  --section-y: 5rem;     /* 80px 大区块 */
+  --section-y-sm: 3rem;  /* 48px 小区块 */
+}
+
+/* ─────────────────────────────────────────
+   全局基础样式
+───────────────────────────────────────── */
+html {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-canvas);
+  line-height: 1.75;
+}
+
+/* 防止任何元素造成横向溢出 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ─────────────────────────────────────────
+   字体层级系统
+   H1 → 内页标题 / 首页更大
+───────────────────────────────────────── */
+
+/* 内页 H1 */
+.page-title {
+  font-size: clamp(1.875rem, 4vw, 2.75rem); /* 30px → 44px */
+  font-weight: 600;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+/* 首页 Hero — 克制个人站 */
+.hero-title {
+  font-size: clamp(1.75rem, 3.25vw, 2.5rem); /* 28px → 40px */
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+}
+
+/* 区块标题 H2 */
+.section-heading {
+  font-size: clamp(1.25rem, 2.5vw, 1.625rem); /* 20px → 26px */
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: var(--color-ink);
+}
+
+/* 卡片标题 */
+.card-title {
+  font-size: 1.0625rem; /* 17px */
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--color-ink);
+}
+
+/* 小标签（页面类型） */
+.page-label {
+  font-size: 0.75rem;   /* 12px */
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-stone);
+}
+
+/* ─────────────────────────────────────────
+   中文正文阅读优化
+───────────────────────────────────────── */
+.prose-zh {
+  font-size: 1.0625rem;  /* 17px */
+  line-height: 1.9;
+  letter-spacing: 0.015em;
+  color: var(--color-ink);
+}
+
+.prose-zh p {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.prose-zh h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2.2em;
+  margin-bottom: 0.8em;
+  letter-spacing: -0.01em;
+}
+
+.prose-zh h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+}
+
+/* 文章内 FAQ 区块间距 */
+.prose-zh .faq-section {
+  margin-top: 2.5em;
+  padding-top: 2em;
+  border-top: 1px solid var(--color-border);
+}
+
+/* 防止长文横向溢出 */
+.article-prose {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* ─────────────────────────────────────────
+   全局链接过渡
+───────────────────────────────────────── */
+a {
+  transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+/* ─────────────────────────────────────────
+   选中文字颜色
+───────────────────────────────────────── */
+::selection {
+  background-color: #F0EAE2;
+  color: var(--color-ink);
+}
+
+/* ─────────────────────────────────────────
+   滚动条（Webkit）
+───────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: #DDD6CC;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: #C4A882; }
+
+/* ─────────────────────────────────────────
+   无障碍焦点
+───────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #8B7355;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ─────────────────────────────────────────
+   图片自适应
+───────────────────────────────────────── */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ─────────────────────────────────────────
+   卡片 hover 过渡
+───────────────────────────────────────── */
+.card-hover {
+  transition: border-color 0.15s ease;
+}
+.card-hover:hover {
+  border-color: #C4A882;
+}
