@@ -1,3 +1,4 @@
 zeno-site/.next/
 zeno-site/out/
 zeno-site/node_modules/
+*.tsbuildinfo
