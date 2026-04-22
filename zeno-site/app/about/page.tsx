@@ -38,7 +38,7 @@ export default function AboutPage() {
         subtitle="从工地出发的现实派生活建造者。这不是一份履历，而是你判断这个人是否值得长期关注的页面。"
       />
 
-      <Container size="reading" className="py-14 sm:py-16">
+      <Container size="content" className="py-14 sm:py-16">
         {/* ── 我是谁 ── */}
         <section className="mb-12">
           <h2 className="section-heading mb-5">我是谁</h2>
@@ -100,10 +100,7 @@ export default function AboutPage() {
         {/* ── 联系入口 ── */}
         <section className="border-t border-border pt-10">
           <h2 className="section-heading mb-4">如果你想联系我</h2>
-          <p className="text-sm text-ink-muted leading-relaxed mb-6">
-            你可以通过联系页找到我。公众号是 Zeno AI装修笔记，微信是 zanxiansheng2025，邮箱是 1603165918@qq.com。
-            如果你是想讨论真实问题，而不是来套模板，我们会更高效。
-          </p>
+
           <CTA href="/contact" label="去联系页" variant="secondary" />
         </section>
       </Container>

@@ -51,22 +51,14 @@ export default async function ResourcesPage() {
 
       <Container size="content" className="py-section">
 
-        {/* 权限说明 */}
+        {/* 领取说明 */}
         <div className="mb-12 p-5 border border-border bg-surface-warm">
           <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-2">
             如何领取
           </p>
-          {user ? (
-            <p className="text-sm text-ink-muted leading-relaxed">
-              你已登录。标注「登录领取」的资料，关注公众号「Zeno AI装修笔记」后回复对应关键词即可获取。
-            </p>
-          ) : (
-            <p className="text-sm text-ink-muted leading-relaxed">
-              部分资料需要登录后领取。
-              <Link href="/login" className="text-stone hover:underline underline-offset-2 ml-1">登录</Link>
-              后可解锁更多内容。关注公众号「Zeno AI装修笔记」，回复对应关键词即可获取。
-            </p>
-          )}
+          <p className="text-sm text-ink-muted leading-relaxed">
+            关注公众号「Zeno AI装修笔记」，回复对应关键词即可获取。
+          </p>
         </div>
 
         {/* 资料卡片列表 */}
@@ -96,10 +88,6 @@ export default async function ResourcesPage() {
                       }`}
                     >
                       {resource.tag}
-                    </span>
-                    {/* 权限标签 */}
-                    <span className={`text-xs px-2 py-0.5 font-medium ${accessStyle}`}>
-                      {accessLabel}
                     </span>
                   </div>
                   <h2 className="text-lg font-semibold text-ink leading-tight">{resource.title}</h2>
@@ -166,7 +154,7 @@ export default async function ResourcesPage() {
                 </div>
               </div>
 
-              {/* 卡片底部：领取方式 + 权限按鈕 */}
+              {/* 卡片底部：领取方式 */}
               <div className="px-6 py-4 border-t border-border bg-stone-pale/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                   <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-1">
@@ -175,25 +163,12 @@ export default async function ResourcesPage() {
                   <p className="text-sm text-ink-muted">{resource.howToGet}</p>
                 </div>
                 <div className="shrink-0">
-                  {canAccess ? (
-                    <Link
-                      href="/contact"
-                      className="inline-block text-sm text-stone hover:underline underline-offset-2 decoration-stone-light"
-                    >
-                      {buttonLabel} →
-                    </Link>
-                  ) : level === 'login' && !user ? (
-                    <Link
-                      href={`/login?callbackUrl=/resources%23${resource.slug}`}
-                      className="inline-block text-sm text-stone border border-stone/30 px-3 py-1.5 hover:bg-stone-pale/50 transition-colors"
-                    >
-                      {buttonLabel}
-                    </Link>
-                  ) : (
-                    <span className="inline-block text-sm text-ink-faint border border-border px-3 py-1.5">
-                      {buttonLabel}
-                    </span>
-                  )}
+                  <Link
+                    href="/contact"
+                    className="inline-block text-sm text-stone hover:underline underline-offset-2 decoration-stone-light"
+                  >
+                    领取 →
+                  </Link>
                 </div>
               </div>
             </div>

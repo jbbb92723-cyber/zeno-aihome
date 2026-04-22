@@ -28,7 +28,7 @@ export default function Header() {
             href="/"
             className="text-ink font-semibold text-[0.9375rem] tracking-tight hover:text-stone transition-colors"
           >
-            Zeno
+            Zeno 赞诺
           </Link>
 
           {/* Desktop Nav */}
