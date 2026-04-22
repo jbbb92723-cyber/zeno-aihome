@@ -19,6 +19,11 @@ export default async function Md2WechatPage() {
     process.env.MD2WECHAT_API_KEY
   )
 
+  // 图片生成配置（服务端读取，只传安全信息给客户端）
+  const isImageConfigured = !!(process.env.VOLCENGINE_ARK_API_KEY && process.env.VOLCENGINE_IMAGE_MODEL)
+  const imageModel = process.env.VOLCENGINE_IMAGE_MODEL ?? 'Doubao-Seedream-5.0-lite'
+  const imagePrice = process.env.VOLCENGINE_IMAGE_PRICE_PER_IMAGE ?? '0.22'
+
   return (
     <Container size="wide" className="py-14 sm:py-18">
       {/* 页面标题 */}
@@ -33,7 +38,13 @@ export default async function Md2WechatPage() {
         </p>
       </div>
 
-      <Md2WechatToolClient isAdmin={isAdmin} isApiConfigured={isApiConfigured} />
+      <Md2WechatToolClient
+        isAdmin={isAdmin}
+        isApiConfigured={isApiConfigured}
+        isImageConfigured={isImageConfigured}
+        imageModel={imageModel}
+        imagePrice={imagePrice}
+      />
     </Container>
   )
 }

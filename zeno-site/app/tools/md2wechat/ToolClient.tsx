@@ -23,9 +23,18 @@ const FONT_SIZES = [
 interface Props {
   isAdmin: boolean
   isApiConfigured: boolean
+  isImageConfigured: boolean
+  imageModel: string
+  imagePrice: string
 }
 
-export default function Md2WechatToolClient({ isAdmin, isApiConfigured }: Props) {
+export default function Md2WechatToolClient({
+  isAdmin,
+  isApiConfigured,
+  isImageConfigured,
+  imageModel,
+  imagePrice,
+}: Props) {
   // ─── 输入状态 ─────────────────────────────────────────────────
   const [markdown, setMarkdown]     = useState('')
   const [theme, setTheme]           = useState('default')
@@ -288,14 +297,20 @@ export default function Md2WechatToolClient({ isAdmin, isApiConfigured }: Props)
 
             {/* 生成封面图 */}
             <div className="border border-border bg-surface p-5 space-y-3">
-              <p className="text-sm font-medium text-ink">生成封面图</p>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-medium text-ink">AI 配图</p>
+                <span className="text-[0.65rem] text-ink-faint border border-border px-1.5 py-0.5">仅管理员</span>
+              </div>
+              <p className="text-xs text-ink-faint font-mono">{imageModel}</p>
               <p className="text-xs text-ink-muted leading-relaxed">
-                使用豆包图片生成，根据文章内容自动生成封面图。
-                约 ¥{process.env.NEXT_PUBLIC_IMAGE_PRICE ?? '0.22'} / 张。
+                当前模型：{imageModel}。预估成本 ¥{imagePrice} / 张，实际费用以火山控制台为准。
               </p>
+              {!isImageConfigured && (
+                <p className="text-xs text-amber-600">火山引擎图片生成 API 尚未配置</p>
+              )}
               <button
                 onClick={handleGenerateImage}
-                disabled={genImage}
+                disabled={genImage || !isImageConfigured}
                 className="text-sm text-stone border border-stone/40 px-4 py-2 hover:bg-stone-pale transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 {genImage ? '生成中…' : '生成封面图'}
