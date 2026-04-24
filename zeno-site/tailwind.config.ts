@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -9,28 +10,25 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ─── 背景层 ───
-        canvas: '#FAF8F4',        // 全站暖白底
-        surface: '#FFFFFF',       // 卡片/浮层白
-        'surface-warm': '#F5F2EE',// 轻底色区块
-        // ─── 文字层 ───
-        ink: '#2A2723',           // 主文字：深暖灰
-        'ink-muted': '#6F6860',   // 次级文字
-        'ink-faint': '#A09890',   // 辅助说明文字
-        // ─── 品牌色：暖石色 ───
-        stone: '#8B7355',
+        // ─── 语义色（CSS 变量，自动响应暗色模式）───
+        canvas:       'var(--color-canvas)',
+        surface:      'var(--color-surface)',
+        'surface-warm': 'var(--color-surface-warm)',
+        ink:          'var(--color-ink)',
+        'ink-muted':  'var(--color-ink-muted)',
+        'ink-faint':  'var(--color-ink-faint)',
+        stone:        'var(--color-stone)',
         'stone-light': '#C4A882',
-        'stone-pale': '#F0EAE2',
-        'stone-deep': '#6B5840',
-        // ─── 边框 ───
-        border: '#E8E1D8',
+        'stone-pale':  '#F0EAE2',
+        'stone-deep':  '#6B5840',
+        border:       'var(--color-border)',
         'border-subtle': '#F0EBE4',
         // ─── 专题色 ───
-        topic1: '#8B7355',  // 居住与装修
-        topic2: '#6B7A5E',  // 工地视角
-        topic3: '#5B6E8A',  // 长期主义
-        topic4: '#7A6B8A',  // AI升级
-        topic5: '#8A6B5B',  // 美学与生活
+        topic1: '#8B7355',
+        topic2: '#6B7A5E',
+        topic3: '#5B6E8A',
+        topic4: '#7A6B8A',
+        topic5: '#8A6B5B',
       },
       fontFamily: {
         sans: ['var(--font-noto)', 'var(--font-inter)', 'system-ui', 'sans-serif'],

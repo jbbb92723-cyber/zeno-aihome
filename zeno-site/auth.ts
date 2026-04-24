@@ -1,106 +1,72 @@
 /**
  * auth.ts — Auth.js v5 配置
  *
- * 支持的登录方式：
- *   - 邮箱 Magic Link（Resend），需要 AUTH_RESEND_KEY + DATABASE_URL
- *   - 微信网页 OAuth，需要 WECHAT_OPEN_CLIENT_ID + WECHAT_OPEN_CLIENT_SECRET
+ * 登录方式：
+ *   1. 邮箱 + 密码（Credentials Provider）
+ *   2. Google OAuth
  *
- * 数据库：Neon Serverless Postgres + Drizzle ORM（存储用户 + 验证令牌）
+ * 数据库：Supabase Postgres + Prisma
+ * 管理员：独立走 /admin/login + ADMIN_PASSWORD，与普通用户完全分离
  */
 
 import NextAuth from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
-import Resend from 'next-auth/providers/resend'
-import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import { db } from '@/lib/db'
-import { users, accounts, sessions, verificationTokens } from '@/lib/db/schema'
-
-// ─────────────────────────────────────────────────────────────
-// Resend 邮箱 Magic Link（需要 AUTH_RESEND_KEY）
-// ─────────────────────────────────────────────────────────────
-const resendProvider = process.env.AUTH_RESEND_KEY
-  ? Resend({
-      apiKey: process.env.AUTH_RESEND_KEY,
-      from:   process.env.EMAIL_FROM ?? 'Zeno 赞诺 <noreply@zenoaihome.com>',
-    })
-  : null
-
-// ─────────────────────────────────────────────────────────────
-// 微信网页 OAuth（网站扫码登录）
-// 需要在微信开放平台注册「网站应用」并通过审核
-// 回调地址：https://zenoaihome.com/api/auth/callback/wechat
-// ─────────────────────────────────────────────────────────────
-const wechatConfigured =
-  !!process.env.WECHAT_OPEN_CLIENT_ID &&
-  !!process.env.WECHAT_OPEN_CLIENT_SECRET
-
-const wechatProvider = wechatConfigured
-  ? {
-      id:           'wechat',
-      name:         '微信',
-      type:         'oauth' as const,
-      clientId:     process.env.WECHAT_OPEN_CLIENT_ID!,
-      clientSecret: process.env.WECHAT_OPEN_CLIENT_SECRET!,
-      authorization: {
-        url: 'https://open.weixin.qq.com/connect/qrconnect',
-        params: {
-          scope:         'snsapi_login',
-          response_type: 'code',
-        },
-      },
-      token:    'https://api.weixin.qq.com/sns/oauth2/access_token',
-      userinfo: {
-        url: 'https://api.weixin.qq.com/sns/userinfo',
-        async request({ tokens, provider }: {
-          tokens:   Record<string, string>
-          provider: { userinfo?: { url?: string } }
-        }) {
-          const url = `${provider.userinfo?.url}?access_token=${tokens.access_token}&openid=${tokens.openid}&lang=zh_CN`
-          const res = await fetch(url)
-          return res.json()
-        },
-      },
-      profile(profile: Record<string, unknown>) {
-        const openid = String(profile.openid ?? '')
-        return {
-          id:    openid,
-          name:  String(profile.nickname ?? '微信用户'),
-          // 微信不返回邮箱，用 openid 合成占位邮箱
-          email: `${openid}@wechat.zenoaihome.com`,
-          image: profile.headimgurl ? String(profile.headimgurl) : null,
-        }
-      },
-    }
-  : null
+import Credentials from 'next-auth/providers/credentials'
+import Google from 'next-auth/providers/google'
+import { PrismaAdapter } from '@auth/prisma-adapter'
+import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
 
 const authConfig: NextAuthConfig = {
-  // ─── 数据库适配器（存储用户 + OAuth 账号 + 验证令牌）────────
-  adapter: DrizzleAdapter(db, {
-    usersTable:              users,
-    accountsTable:           accounts,
-    sessionsTable:           sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+  adapter: PrismaAdapter(prisma),
 
   providers: [
-    ...(resendProvider  ? [resendProvider]  : []),
-    ...(wechatProvider  ? [wechatProvider]  : []),
+    // ─── 邮箱 + 密码 ────────────────────────────────────────
+    Credentials({
+      id: 'credentials',
+      name: '邮箱登录',
+      credentials: {
+        email:    { label: '邮箱', type: 'email' },
+        password: { label: '密码', type: 'password' },
+      },
+      async authorize(credentials) {
+        const email = (credentials?.email as string)?.trim().toLowerCase()
+        const password = credentials?.password as string
+        if (!email || !password) return null
+
+        const user = await prisma.user.findUnique({ where: { email } })
+        if (!user || !user.passwordHash) return null
+
+        const valid = await bcrypt.compare(password, user.passwordHash)
+        if (!valid) return null
+
+        return {
+          id:    user.id,
+          email: user.email,
+          name:  user.name,
+          image: user.image,
+        }
+      },
+    }),
+
+    // ─── Google OAuth ──────────────────────────────────────
+    Google({
+      clientId:     process.env.AUTH_GOOGLE_ID     ?? process.env.GOOGLE_CLIENT_ID     ?? '',
+      clientSecret: process.env.AUTH_GOOGLE_SECRET ?? process.env.GOOGLE_CLIENT_SECRET ?? '',
+      allowDangerousEmailAccountLinking: true,
+    }),
   ],
 
-  // ─── Session 策略：JWT（无需数据库 session 表）──────────────
   session: {
     strategy: 'jwt',
-    maxAge:   30 * 24 * 60 * 60, // 30 天
+    maxAge: 30 * 24 * 60 * 60,
   },
 
-  // ─── 页面路由 ────────────────────────────────────────────
   pages: {
-    signIn:        '/login',
-    error:         '/login',
-    verifyRequest: '/login/verify', // 邮件已发送确认页
+    signIn: '/login',
+    error:  '/login',
   },
 
-  // ─── 回调 ────────────────────────────────────────────────
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
@@ -115,23 +81,15 @@ const authConfig: NextAuthConfig = {
 
     async session({ session, token }) {
       if (token) {
-        session.user.id       = token.id       as string
-        session.user.role     = token.role     as string
+        session.user.id       = token.id as string
+        session.user.role     = token.role as string
         session.user.provider = (token.provider as string) ?? ''
       }
       return session
     },
   },
 
-  events: {
-    async signIn({ user, isNewUser }) {
-      if (isNewUser) {
-        console.log('[Auth] New user signed in:', user.email)
-      }
-    },
-  },
-
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig)

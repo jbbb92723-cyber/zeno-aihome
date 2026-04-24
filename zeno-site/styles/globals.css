@@ -9,9 +9,10 @@
   --font-inter: 'Inter', sans-serif;
   --font-noto: 'Noto Sans SC', sans-serif;
 
-  /* 颜色语义变量 */
+  /* 颜色语义变量 — 亮色 */
   --color-canvas:      #FAF8F4;
   --color-surface:     #FFFFFF;
+  --color-surface-warm:#F5F2EE;
   --color-ink:         #2A2723;
   --color-ink-muted:   #6F6860;
   --color-ink-faint:   #A09890;
@@ -19,8 +20,20 @@
   --color-border:      #E8E1D8;
 
   /* 间距节奏 */
-  --section-y: 5rem;     /* 80px 大区块 */
-  --section-y-sm: 3rem;  /* 48px 小区块 */
+  --section-y: 5rem;
+  --section-y-sm: 3rem;
+}
+
+/* 暗色主题 — 温暖暗色，非纯黑 */
+.dark {
+  --color-canvas:      #1C1A17;
+  --color-surface:     #252320;
+  --color-surface-warm:#2A2825;
+  --color-ink:         #E8E2DA;
+  --color-ink-muted:   #A09890;
+  --color-ink-faint:   #706860;
+  --color-stone:       #C4A882;
+  --color-border:      #3A3530;
 }
 
 /* ─────────────────────────────────────────

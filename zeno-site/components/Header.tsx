@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState } from 'react'
+import ThemeToggle from '@/components/ThemeToggle'
 
 const cnNavLinks = [
   { href: '/',          label: '首页' },
@@ -122,6 +123,9 @@ export default function Header() {
             >
               {langLabel}
             </Link>
+
+            {/* 主题切换 */}
+            <ThemeToggle />
 
             {/* 登录入口 */}
             <Link

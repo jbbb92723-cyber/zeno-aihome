@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import { Inter, Noto_Sans_SC } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
+import { ThemeProvider } from '@/components/ThemeProvider'
+import { SessionProvider } from 'next-auth/react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import '@/styles/globals.css'
-
-// Build trigger: 2026-04-24 env vars update
 
 const inter = Inter({
   subsets: ['latin'],
@@ -56,11 +56,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="zh-CN" className={`${inter.variable} ${notoSansSC.variable}`}>
+    <html lang="zh-CN" className={`${inter.variable} ${notoSansSC.variable}`} suppressHydrationWarning>
       <body className="bg-canvas text-ink font-sans antialiased">
-        <Header />
-        <main className="min-h-[calc(100vh-56px)]">{children}</main>
-        <Footer />
+        <SessionProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+            <Header />
+            <main className="min-h-[calc(100vh-56px)]">{children}</main>
+            <Footer />
+          </ThemeProvider>
+        </SessionProvider>
         <Analytics />
       </body>
     </html>
