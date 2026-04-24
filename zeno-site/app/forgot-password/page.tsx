@@ -11,6 +11,7 @@ export default function ForgotPasswordPage() {
   const [codeSent, setCodeSent]     = useState(false)
   const [countdown, setCountdown]   = useState(0)
   const [error, setError]           = useState('')
+  const [emailDown, setEmailDown]   = useState(false)
 
   async function sendCode(e: React.FormEvent) {
     e.preventDefault()
@@ -27,6 +28,10 @@ export default function ForgotPasswordPage() {
     })
     const data = await res.json()
 
+    if (res.status === 503) {
+      setEmailDown(true)
+      return
+    }
     if (!res.ok) {
       setError(data.error || '发送失败')
       return
@@ -58,6 +63,12 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
+        {emailDown && (
+          <div className="mb-6 px-4 py-4 border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
+            <p className="font-medium mb-1">邮件服务未配置</p>
+            <p className="text-xs opacity-80">RESEND_API_KEY 尚未配置，无法发送验证码。请稍后重试。</p>
+          </div>
+        )}
         {error && (
           <div className="mb-4 px-4 py-3 border border-red-200 bg-red-50 dark:bg-red-950/30 dark:border-red-800 text-sm text-red-700 dark:text-red-400">
             {error}
