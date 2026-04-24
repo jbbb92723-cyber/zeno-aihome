@@ -97,6 +97,18 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* ── 如果你需要更具体的判断 ── */}
+        <section className="mb-12 border border-border p-6 sm:p-8">
+          <h2 className="section-heading mb-4">如果你需要的不是更多信息，而是更具体的判断</h2>
+          <p className="text-sm text-ink-muted leading-relaxed mb-2">
+            如果你正在装修，手里已经有报价单、方案、预算或施工判断问题，可以直接看我现在开放的服务。
+          </p>
+          <p className="text-sm text-ink-muted leading-relaxed mb-5">
+            如果你想把 AI 真正接进自己的工作流，而不是停留在工具尝鲜，也可以先看看我提供的咨询方向。
+          </p>
+          <CTA href="/services" label="查看服务" variant="secondary" />
+        </section>
+
         {/* ── 联系入口 ── */}
         <section className="border-t border-border pt-10">
           <h2 className="section-heading mb-4">如果你想联系我</h2>

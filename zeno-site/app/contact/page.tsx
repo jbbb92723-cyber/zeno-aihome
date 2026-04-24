@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import PageHero from '@/components/PageHero'
 import Container from '@/components/Container'
 
@@ -57,6 +58,41 @@ export default function ContactPage() {
       />
 
       <Container size="content" className="py-14 sm:py-16">
+
+        {/* ── 联系前先判断 ── */}
+        <section className="mb-14">
+          <h2 className="section-heading mb-6">联系前先判断</h2>
+          <p className="text-sm text-ink-muted mb-6">不同的情况，有不同的最优路径。先看看你属于哪一种：</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="border border-border p-5">
+              <p className="text-sm font-semibold text-ink mb-2">你有明确的问题要解决</p>
+              <p className="text-xs text-ink-muted leading-relaxed mb-4">
+                手里有报价单、方案、预算，或者想把 AI 接进工作流——直接看服务页更高效。
+              </p>
+              <Link href="/services" className="text-sm text-stone hover:underline underline-offset-2 decoration-stone/40">
+                查看服务 →
+              </Link>
+            </div>
+            <div className="border border-border p-5">
+              <p className="text-sm font-semibold text-ink mb-2">你还在了解阶段</p>
+              <p className="text-xs text-ink-muted leading-relaxed mb-4">
+                先建立基本判断，再决定下一步。资料库里有免费清单、模板和工具。
+              </p>
+              <Link href="/resources" className="text-sm text-stone hover:underline underline-offset-2 decoration-stone/40">
+                先看资料库 →
+              </Link>
+            </div>
+            <div className="border border-border p-5">
+              <p className="text-sm font-semibold text-ink mb-2">合作或其他事项</p>
+              <p className="text-xs text-ink-muted leading-relaxed mb-4">
+                内容合作、媒体合作、或不适合走标准服务流程的沟通，请直接联系。
+              </p>
+              <span className="text-xs text-ink-faint">↓ 往下看联系方式</span>
+            </div>
+          </div>
+        </section>
+
+        <hr className="border-border mb-14" />
 
         {/* ── 联系方式 ── */}
         <section className="mb-14">

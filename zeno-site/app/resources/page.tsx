@@ -179,6 +179,27 @@ export default async function ResourcesPage() {
                   </Link>
                 </div>
               </div>
+
+              {/* 服务 cross-sell：仅装修类资料显示 */}
+              {(resource.slug === 'baojia-shenhe-qingdan' ||
+                resource.slug === 'zhuangxiu-yusuan-moban' ||
+                resource.slug === 'shizhu-pai-zijian-biao') && (
+                <div className="px-6 py-3.5 border-t border-border bg-surface-warm/50">
+                  <p className="text-xs text-ink-muted leading-relaxed">
+                    {resource.slug === 'baojia-shenhe-qingdan'
+                      ? '如果你手里已经有报价单，想让人直接帮你看，审核服务会比清单更直接。'
+                      : resource.slug === 'zhuangxiu-yusuan-moban'
+                      ? '如果你的预算已经理不清了，具体的判断通常比再看一份模板更有效。'
+                      : '先用资料建立判断，再决定是否需要我直接帮你看。'}
+                    <Link
+                      href="/services"
+                      className="text-stone hover:underline underline-offset-2 decoration-stone/40 ml-1"
+                    >
+                      查看服务 →
+                    </Link>
+                  </p>
+                </div>
+              )}
             </div>
             )
           })}
