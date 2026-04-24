@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import Container from '@/components/Container'
 import PasswordInput from '@/components/PasswordInput'
 
-export default function RegisterPage() {
+export default function EnRegisterPage() {
   const router = useRouter()
   const [email, setEmail]           = useState('')
   const [password, setPassword]     = useState('')
@@ -21,7 +21,7 @@ export default function RegisterPage() {
 
   async function sendCode() {
     if (!email.trim()) {
-      setError('请输入邮箱')
+      setError('Please enter your email address.')
       return
     }
     setError('')
@@ -38,7 +38,7 @@ export default function RegisterPage() {
       return
     }
     if (!res.ok) {
-      setError(data.error || '发送失败')
+      setError(data.error || 'Failed to send code.')
       return
     }
 
@@ -57,7 +57,7 @@ export default function RegisterPage() {
     setError('')
 
     if (password !== confirm) {
-      setError('两次密码不一致')
+      setError('Passwords do not match.')
       return
     }
 
@@ -70,30 +70,35 @@ export default function RegisterPage() {
     const data = await res.json()
 
     if (!res.ok) {
-      setError(data.error || '注册失败')
+      setError(data.error || 'Registration failed.')
       setLoading(false)
       return
     }
 
-    setSuccess('注册成功！正在跳转到登录页面...')
-    setTimeout(() => router.push('/login'), 1500)
+    setSuccess('Account created! Redirecting to sign in…')
+    setTimeout(() => router.push('/en/login'), 1500)
   }
 
   return (
     <Container size="content" className="py-section">
       <div className="max-w-sm mx-auto">
         <div className="mb-10">
-          <p className="page-label mb-3">注册</p>
-          <h1 className="text-2xl font-semibold text-ink tracking-tight">注册 Zeno 赞诺</h1>
+          <p className="page-label mb-3">Register</p>
+          <h1 className="text-2xl font-semibold text-ink tracking-tight">Create an account</h1>
           <p className="text-sm text-ink-muted mt-3 leading-relaxed">
-            注册后可以领取资料、发表评论。
+            Register to download resources and leave comments.
           </p>
         </div>
 
         {emailDown && (
           <div className="mb-6 px-4 py-4 border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
-            <p className="font-medium mb-1">注册功能暂时不可用</p>
-            <p className="text-xs opacity-80">Exchange verification codes require the email service (Resend). The admin has not yet configured <code className="font-mono bg-amber-100 dark:bg-amber-900 px-1">RESEND_API_KEY</code> in Vercel. Please try again later.</p>
+            <p className="font-medium mb-1">Registration temporarily unavailable</p>
+            <p className="text-xs opacity-80">
+              Email verification requires the Resend service. The admin has not yet configured{' '}
+              <code className="font-mono bg-amber-100 dark:bg-amber-900 px-1">RESEND_API_KEY</code>{' '}
+              in Vercel. Please try again later or{' '}
+              <Link href="/en/about" className="underline underline-offset-2">contact Zeno</Link>.
+            </p>
           </div>
         )}
         {error && (
@@ -109,7 +114,7 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm text-ink-muted mb-1.5">邮箱</label>
+            <label className="block text-sm text-ink-muted mb-1.5">Email</label>
             <input
               type="email"
               value={email}
@@ -121,27 +126,27 @@ export default function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm text-ink-muted mb-1.5">密码</label>
+            <label className="block text-sm text-ink-muted mb-1.5">Password</label>
             <PasswordInput
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              placeholder="至少 8 位，包含字母和数字"
+              placeholder="At least 8 characters, letters + numbers"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-ink-muted mb-1.5">确认密码</label>
+            <label className="block text-sm text-ink-muted mb-1.5">Confirm password</label>
             <PasswordInput
               value={confirm}
               onChange={e => setConfirm(e.target.value)}
               required
-              placeholder="再输一次密码"
+              placeholder="Type your password again"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-ink-muted mb-1.5">邮箱验证码</label>
+            <label className="block text-sm text-ink-muted mb-1.5">Verification code</label>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -150,33 +155,33 @@ export default function RegisterPage() {
                 onChange={e => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                 required
                 className="flex-1 text-sm text-ink bg-surface border border-border px-3 py-2 placeholder:text-ink-faint focus:outline-none focus:border-stone transition-colors"
-                placeholder="6 位数字"
+                placeholder="6-digit code"
               />
               <button
                 type="button"
                 onClick={sendCode}
-                disabled={countdown > 0}
+                disabled={countdown > 0 || emailDown}
                 className="shrink-0 text-sm text-stone border border-stone/30 px-3 py-2 hover:bg-stone-pale/50 disabled:opacity-50 transition-colors"
               >
-                {countdown > 0 ? `${countdown}s` : codeSent ? '重新发送' : '获取验证码'}
+                {countdown > 0 ? `${countdown}s` : codeSent ? 'Resend' : 'Send code'}
               </button>
             </div>
           </div>
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || emailDown}
             className="w-full text-sm font-medium text-white bg-stone px-4 py-2.5 hover:bg-stone/85 disabled:opacity-50 transition-colors"
           >
-            {loading ? '注册中...' : '注册'}
+            {loading ? 'Creating account…' : 'Register'}
           </button>
         </form>
 
         <div className="mt-8 text-center">
           <p className="text-sm text-ink-muted">
-            已有账号？{' '}
-            <Link href="/login" className="text-stone hover:underline underline-offset-2">
-              登录
+            Already have an account?{' '}
+            <Link href="/en/login" className="text-stone hover:underline underline-offset-2">
+              Sign in
             </Link>
           </p>
         </div>

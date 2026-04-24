@@ -34,7 +34,8 @@ const CN_TO_EN: Record<string, string> = {
   '/services':         '/en/about',
   '/contact':          '/en/about',
   '/tools/md2wechat':  '/en/tools',
-  '/login':            '/login',
+  '/login':            '/en/login',
+  '/register':         '/en/register',
 }
 
 const EN_TO_CN: Record<string, string> = {
@@ -44,6 +45,8 @@ const EN_TO_CN: Record<string, string> = {
   '/en/topics':    '/topics',
   '/en/tools':     '/resources',
   '/en/tools/prompts': '/tools/md2wechat',
+  '/en/login':     '/login',
+  '/en/register':  '/register',
 }
 
 function getLangHref(pathname: string, isEn: boolean): string {
@@ -78,6 +81,7 @@ export default function Header() {
   const logoText = isEn ? 'Zeno' : 'Zeno 赞诺'
   const logoHref = isEn ? '/en' : '/'
   const loginLabel = isEn ? 'Log in' : '登录'
+  const loginHref  = isEn ? '/en/login' : '/login'
   const langLabel = isEn ? '中文' : 'EN'
   const langHref = getLangHref(pathname, isEn)
 
@@ -129,9 +133,9 @@ export default function Header() {
 
             {/* 登录入口 */}
             <Link
-              href="/login"
+              href={loginHref}
               className={`text-[0.8125rem] transition-colors ${
-                pathname === '/login' || pathname.startsWith('/account')
+                pathname === '/login' || pathname === '/en/login' || pathname.startsWith('/account')
                   ? 'text-stone font-semibold'
                   : 'text-ink-muted hover:text-ink'
               }`}
@@ -185,10 +189,10 @@ export default function Header() {
             {/* 语言切换 + 登录 */}
             <div className="flex items-center justify-between py-3">
               <Link
-                href="/login"
+                href={loginHref}
                 onClick={() => setMenuOpen(false)}
                 className={`text-sm transition-colors ${
-                  pathname === '/login' || pathname.startsWith('/account')
+                  pathname === '/login' || pathname === '/en/login' || pathname.startsWith('/account')
                     ? 'text-stone font-semibold'
                     : 'text-ink-muted hover:text-ink'
                 }`}
