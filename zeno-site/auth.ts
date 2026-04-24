@@ -1,160 +1,151 @@
 /**
  * auth.ts — Auth.js v5 配置
  *
- * 使用 next-auth@5 (Auth.js v5 beta)
+ * 支持的登录方式：
+ *   - 邮箱 Magic Link（Resend），需要 AUTH_RESEND_KEY + DATABASE_URL
+ *   - 微信网页 OAuth，需要 WECHAT_OPEN_CLIENT_ID + WECHAT_OPEN_CLIENT_SECRET
  *
- * IDC Flare OAuth 端点状态：【待补充】
- * 需要到 IDC Flare 开发者后台获取：
- *   - IDCFLARE_AUTHORIZATION_URL
- *   - IDCFLARE_TOKEN_URL
- *   - IDCFLARE_USERINFO_URL
- *   - IDCFLARE_CLIENT_ID
- *   - IDCFLARE_CLIENT_SECRET
- *
- * 详见：IDC-Flare-OAuth接入说明.md
+ * 数据库：Neon Serverless Postgres + Drizzle ORM（存储用户 + 验证令牌）
  */
 
 import NextAuth from 'next-auth'
 import type { NextAuthConfig } from 'next-auth'
+import Resend from 'next-auth/providers/resend'
+import { DrizzleAdapter } from '@auth/drizzle-adapter'
+import { db } from '@/lib/db'
+import { users, accounts, sessions, verificationTokens } from '@/lib/db/schema'
 
-// ─────────────────────────────────────────
-// IDC Flare 自定义 OAuth Provider
-// 所有端点从环境变量读取，不写死
-// ─────────────────────────────────────────
-const idcFlareConfigured =
-  !!process.env.IDCFLARE_CLIENT_ID &&
-  !!process.env.IDCFLARE_CLIENT_SECRET &&
-  !!process.env.IDCFLARE_AUTHORIZATION_URL &&
-  !!process.env.IDCFLARE_TOKEN_URL &&
-  !!process.env.IDCFLARE_USERINFO_URL
+// ─────────────────────────────────────────────────────────────
+// Resend 邮箱 Magic Link（需要 AUTH_RESEND_KEY）
+// ─────────────────────────────────────────────────────────────
+const resendProvider = process.env.AUTH_RESEND_KEY
+  ? Resend({
+      apiKey: process.env.AUTH_RESEND_KEY,
+      from:   process.env.EMAIL_FROM ?? 'Zeno 赞诺 <noreply@zenoaihome.com>',
+    })
+  : null
 
-// 只有当所有端点都配置好了才注册这个 provider
-const idcFlareProvider = idcFlareConfigured
+// ─────────────────────────────────────────────────────────────
+// 微信网页 OAuth（网站扫码登录）
+// 需要在微信开放平台注册「网站应用」并通过审核
+// 回调地址：https://zenoaihome.com/api/auth/callback/wechat
+// ─────────────────────────────────────────────────────────────
+const wechatConfigured =
+  !!process.env.WECHAT_OPEN_CLIENT_ID &&
+  !!process.env.WECHAT_OPEN_CLIENT_SECRET
+
+const wechatProvider = wechatConfigured
   ? {
-      id: 'idcflare',
-      name: 'IDC Flare',
-      type: 'oauth' as const,
-      clientId: process.env.IDCFLARE_CLIENT_ID!,
-      clientSecret: process.env.IDCFLARE_CLIENT_SECRET!,
+      id:           'wechat',
+      name:         '微信',
+      type:         'oauth' as const,
+      clientId:     process.env.WECHAT_OPEN_CLIENT_ID!,
+      clientSecret: process.env.WECHAT_OPEN_CLIENT_SECRET!,
       authorization: {
-        url: process.env.IDCFLARE_AUTHORIZATION_URL!,
+        url: 'https://open.weixin.qq.com/connect/qrconnect',
         params: {
-          scope: 'openid profile email',
+          scope:         'snsapi_login',
           response_type: 'code',
         },
       },
-      token: process.env.IDCFLARE_TOKEN_URL!,
-      userinfo: process.env.IDCFLARE_USERINFO_URL!,
-      // userinfo 响应结构映射到 Auth.js Profile
-      // 如果 IDC Flare 返回的字段名不同，在这里调整
+      token:    'https://api.weixin.qq.com/sns/oauth2/access_token',
+      userinfo: {
+        url: 'https://api.weixin.qq.com/sns/userinfo',
+        async request({ tokens, provider }: {
+          tokens:   Record<string, string>
+          provider: { userinfo?: { url?: string } }
+        }) {
+          const url = `${provider.userinfo?.url}?access_token=${tokens.access_token}&openid=${tokens.openid}&lang=zh_CN`
+          const res = await fetch(url)
+          return res.json()
+        },
+      },
       profile(profile: Record<string, unknown>) {
+        const openid = String(profile.openid ?? '')
         return {
-          id: String(profile.sub ?? profile.id ?? profile.user_id ?? ''),
-          name: String(profile.name ?? profile.display_name ?? profile.nickname ?? ''),
-          email: String(profile.email ?? ''),
-          image: profile.avatar_url
-            ? String(profile.avatar_url)
-            : profile.picture
-              ? String(profile.picture)
-              : null,
+          id:    openid,
+          name:  String(profile.nickname ?? '微信用户'),
+          // 微信不返回邮箱，用 openid 合成占位邮箱
+          email: `${openid}@wechat.zenoaihome.com`,
+          image: profile.headimgurl ? String(profile.headimgurl) : null,
         }
       },
     }
   : null
 
 const authConfig: NextAuthConfig = {
+  // ─── 数据库适配器（存储用户 + OAuth 账号 + 验证令牌）────────
+  adapter: DrizzleAdapter(db, {
+    usersTable:              users,
+    accountsTable:           accounts,
+    sessionsTable:           sessions,
+    verificationTokensTable: verificationTokens,
+  }),
+
   providers: [
-    // 只加入已配置的 provider，避免环境变量缺失时报错
-    ...(idcFlareProvider ? [idcFlareProvider] : []),
-    // 未来可以在这里添加：
-    // GitHub({ clientId: process.env.GITHUB_CLIENT_ID, clientSecret: process.env.GITHUB_CLIENT_SECRET })
-    // Email({ server: process.env.EMAIL_SERVER, from: process.env.EMAIL_FROM })
+    ...(resendProvider  ? [resendProvider]  : []),
+    ...(wechatProvider  ? [wechatProvider]  : []),
   ],
 
-  // ─── Session 策略：使用 JWT（无需数据库 session 表）─────────
-  // 第一阶段使用 JWT，不依赖数据库 session。
-  // 第二阶段如需数据库 session，改为 strategy: 'database'
+  // ─── Session 策略：JWT（无需数据库 session 表）──────────────
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 天
+    maxAge:   30 * 24 * 60 * 60, // 30 天
   },
 
-  // ─── 页面路由 ─────────────────────────────────────────────
+  // ─── 页面路由 ────────────────────────────────────────────
   pages: {
-    signIn: '/login',
-    error: '/login',
+    signIn:        '/login',
+    error:         '/login',
+    verifyRequest: '/login/verify', // 邮件已发送确认页
   },
 
-  // ─── 回调 ─────────────────────────────────────────────────
+  // ─── 回调 ────────────────────────────────────────────────
   callbacks: {
-    /**
-     * jwt 回调：在 JWT 中存储用户角色和 id
-     * 第一阶段从 token.sub 读取，后续可以查询数据库补充 role
-     */
     async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id
-        token.role = 'user' // 默认角色
+        token.id   = user.id
+        token.role = 'user'
       }
-      // 首次登录时存储 provider，后续刷新 token 时 account 为 null
       if (account?.provider) {
         token.provider = account.provider
       }
       return token
     },
 
-    /**
-     * session 回调：将 JWT 中的信息暴露给客户端
-     */
     async session({ session, token }) {
       if (token) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
+        session.user.id       = token.id       as string
+        session.user.role     = token.role     as string
         session.user.provider = (token.provider as string) ?? ''
       }
       return session
     },
   },
 
-  // ─── 事件钩子 ──────────────────────────────────────────────
   events: {
-    /**
-     * 用户首次登录时，在 profiles 表创建记录
-     * TODO（第二阶段）：取消注释并接入真实数据库
-     */
     async signIn({ user, isNewUser }) {
-      if (isNewUser && user.id) {
-        // await db.profiles.create({
-        //   data: {
-        //     id: user.id,
-        //     email: user.email ?? '',
-        //     display_name: user.name ?? '',
-        //     avatar_url: user.image ?? '',
-        //     role: 'user',
-        //   },
-        // })
+      if (isNewUser) {
         console.log('[Auth] New user signed in:', user.email)
       }
     },
   },
 
-  // AUTH_SECRET 从环境变量读取，不写死
   secret: process.env.AUTH_SECRET,
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth(authConfig)
 
-// ─── 类型扩展 ──────────────────────────────────────────────
-// 让 session.user 包含 id 和 role
+// ─── 类型扩展 ────────────────────────────────────────────
 declare module 'next-auth' {
   interface Session {
     user: {
-      id: string
-      role: string
+      id:        string
+      role:      string
       provider?: string
-      name?: string | null
-      email?: string | null
-      image?: string | null
+      name?:     string | null
+      email?:    string | null
+      image?:    string | null
     }
   }
 }

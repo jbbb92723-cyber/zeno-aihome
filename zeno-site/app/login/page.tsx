@@ -1,7 +1,10 @@
 /**
  * app/login/page.tsx
  *
- * 登录页面 — 四种登录方式占位 + IDC Flare 真实接入
+ * 登录页面
+ * - 邮箱 Magic Link（Resend，已接入）
+ * - 微信网页扫码（待配置）
+ * - 手机号验证码（待配置）
  */
 
 import type { Metadata } from 'next'
@@ -15,10 +18,8 @@ export const metadata: Metadata = {
   robots: { index: false },
 }
 
-const isIdcFlareConfigured =
-  !!process.env.IDCFLARE_CLIENT_ID &&
-  !!process.env.IDCFLARE_CLIENT_SECRET &&
-  !!process.env.IDCFLARE_AUTHORIZATION_URL
+const isResendConfigured  = !!process.env.AUTH_RESEND_KEY
+const isWechatConfigured  = !!process.env.WECHAT_OPEN_CLIENT_ID && !!process.env.WECHAT_OPEN_CLIENT_SECRET
 
 export default async function LoginPage({
   searchParams,
@@ -31,13 +32,14 @@ export default async function LoginPage({
   }
 
   const errorMessages: Record<string, string> = {
-    OAuthSignin: 'OAuth 登录初始化失败，请重试。',
-    OAuthCallback: '登录回调出错，请检查 IDC Flare 回调地址配置。',
+    OAuthSignin:        'OAuth 登录初始化失败，请重试。',
+    OAuthCallback:      '登录回调出错，请检查回调地址配置。',
     OAuthCreateAccount: '创建账号时出错，请联系管理员。',
-    Callback: '回调处理出错，请重试。',
-    AccessDenied: '登录被拒绝。',
-    Configuration: '认证配置错误，请联系管理员。',
-    Default: '登录时发生未知错误，请重试。',
+    EmailSignin:        '邮件发送失败，请稍后重试。',
+    Callback:           '回调处理出错，请重试。',
+    AccessDenied:       '登录被拒绝。',
+    Configuration:      '认证配置错误，请联系管理员。',
+    Default:            '登录时发生未知错误，请重试。',
   }
 
   const errorMsg = searchParams.error
@@ -77,11 +79,36 @@ export default async function LoginPage({
                 <path fillRule="evenodd" d="M12 2C6.477 2 2 6.253 2 11.5c0 2.756 1.214 5.23 3.145 6.95L4.5 21.5l3.45-1.725A10.93 10.93 0 0 0 12 21c5.523 0 10-4.253 10-9.5S17.523 2 12 2zm0 17a8.93 8.93 0 0 1-3.775-.83l-.225-.112-2.3 1.15.59-2.065-.19-.183C4.443 15.57 3.5 13.63 3.5 11.5 3.5 6.806 7.262 3 12 3s8.5 3.806 8.5 8.5S16.738 19 12 19z" clipRule="evenodd"/>
               </svg>
               <p className="text-sm font-semibold text-ink">微信登录</p>
-              <span className="text-[0.65rem] text-ink-faint border border-border px-1.5 py-0.5 ml-auto">待配置</span>
+              {isWechatConfigured ? null : (
+                <span className="text-[0.65rem] text-ink-faint border border-border px-1.5 py-0.5 ml-auto">待配置</span>
+              )}
             </div>
-            <p className="text-xs text-ink-muted leading-relaxed">
-              适合微信生态用户，后续可用于小程序、公众号和资料领取。
-            </p>
+            {isWechatConfigured ? (
+              <>
+                <p className="text-xs text-ink-muted leading-relaxed mb-3">
+                  使用微信扫码登录，无需注册新账号。
+                </p>
+                <form
+                  action={async () => {
+                    'use server'
+                    await signIn('wechat', {
+                      redirectTo: searchParams.callbackUrl ?? '/account',
+                    })
+                  }}
+                >
+                  <button
+                    type="submit"
+                    className="text-sm font-medium text-paper bg-stone px-4 py-2 hover:bg-stone/85 transition-colors"
+                  >
+                    微信扫码登录
+                  </button>
+                </form>
+              </>
+            ) : (
+              <p className="text-xs text-ink-muted leading-relaxed">
+                需要在微信开放平台申请「网站应用」并通过审核后开启。
+              </p>
+            )}
           </div>
 
           {/* 邮箱登录 */}
@@ -92,11 +119,46 @@ export default async function LoginPage({
                 <polyline points="2,4 12,13 22,4"/>
               </svg>
               <p className="text-sm font-semibold text-ink">邮箱登录</p>
-              <span className="text-[0.65rem] text-ink-faint border border-border px-1.5 py-0.5 ml-auto">待配置</span>
+              {!isResendConfigured && (
+                <span className="text-[0.65rem] text-ink-faint border border-border px-1.5 py-0.5 ml-auto">待配置</span>
+              )}
             </div>
-            <p className="text-xs text-ink-muted leading-relaxed">
-              适合长期阅读和资料领取，后续可用于接收资料链接和通知。
-            </p>
+            {isResendConfigured ? (
+              <>
+                <p className="text-xs text-ink-muted leading-relaxed mb-3">
+                  输入邮箱，我们会发送一个登录链接，点击即可登录，无需密码。
+                </p>
+                <form
+                  action={async (formData: FormData) => {
+                    'use server'
+                    const email = formData.get('email') as string
+                    await signIn('resend', {
+                      email,
+                      redirectTo: searchParams.callbackUrl ?? '/account',
+                    })
+                  }}
+                  className="space-y-3"
+                >
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="your@email.com"
+                    className="w-full text-sm text-ink bg-paper border border-border px-3 py-2 placeholder:text-ink-faint focus:outline-none focus:border-stone transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    className="text-sm font-medium text-paper bg-stone px-4 py-2 hover:bg-stone/85 transition-colors"
+                  >
+                    发送登录链接
+                  </button>
+                </form>
+              </>
+            ) : (
+              <p className="text-xs text-ink-muted leading-relaxed">
+                需要配置 Resend API Key 和验证发件域名后开启。
+              </p>
+            )}
           </div>
 
           {/* 手机号登录 */}
@@ -110,49 +172,10 @@ export default async function LoginPage({
               <span className="text-[0.65rem] text-ink-faint border border-border px-1.5 py-0.5 ml-auto">待配置</span>
             </div>
             <p className="text-xs text-ink-muted leading-relaxed">
-              适合国内用户快速登录，后续用于服务申请和进度通知。
+              需要接入短信服务后开启，国内用户适用。
             </p>
           </div>
 
-          {/* 分隔线 */}
-          <div className="flex items-center gap-3 py-1">
-            <div className="flex-1 h-px bg-border" />
-            <span className="text-xs text-ink-faint">社区账号</span>
-            <div className="flex-1 h-px bg-border" />
-          </div>
-
-          {/* IDC Flare 登录 */}
-          <div className="border border-border bg-surface p-5">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-stone font-semibold text-sm shrink-0">IDC</span>
-              <p className="text-sm font-semibold text-ink">IDC Flare 登录</p>
-              {!isIdcFlareConfigured && (
-                <span className="text-[0.65rem] text-ink-faint border border-border px-1.5 py-0.5 ml-auto">待配置</span>
-              )}
-            </div>
-            <p className="text-xs text-ink-muted leading-relaxed mb-3">
-              如果你来自 IDC Flare / IF 社区，后续可以直接用社区账号进入本站。
-            </p>
-            {isIdcFlareConfigured ? (
-              <form
-                action={async () => {
-                  'use server'
-                  await signIn('idcflare', {
-                    redirectTo: searchParams.callbackUrl ?? '/account',
-                  })
-                }}
-              >
-                <button
-                  type="submit"
-                  className="text-sm font-medium text-paper bg-stone px-4 py-2 hover:bg-stone/85 transition-colors"
-                >
-                  使用 IDC Flare 登录
-                </button>
-              </form>
-            ) : (
-              <p className="text-xs text-amber-600">IDC Flare OAuth 尚未配置</p>
-            )}
-          </div>
         </div>
 
         {/* 底部说明 */}
