@@ -149,14 +149,43 @@ export default async function ArticlePage({ params }: Props) {
         </div>
       </article>
 
-      {/* 资料库 CTA */}
+      {/* 按分类显示不同 CTA */}
       <section className="bg-stone-pale/30 border-y border-border py-10">
-        <div className="max-w-reading mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-start sm:items-center gap-6 justify-between">
-          <div>
-            <p className="text-sm font-medium text-ink">有相关的实用资料</p>
-            <p className="text-xs text-ink-muted mt-1">装修清单、预算模板、AI 提示词包，可免费领取。</p>
-          </div>
-          <CTA href="/resources" label="去资料库看看" variant="secondary" />
+        <div className="max-w-reading mx-auto px-5 sm:px-8">
+          {article.category === '居住与装修' ? (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 justify-between">
+              <div>
+                <p className="text-sm font-medium text-ink">如果你手里已经有报价单，想少走弯路</p>
+                <p className="text-xs text-ink-muted mt-1">可以直接查看报价审核服务，也可以先看资料建立判断。</p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <CTA href="/services" label="查看报价审核服务" variant="secondary" />
+                <CTA href="/resources" label="先去资料库看看" variant="ghost" />
+              </div>
+            </div>
+          ) : article.category === 'AI 与新生产力' ? (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 justify-between">
+              <div>
+                <p className="text-sm font-medium text-ink">如果你想把 AI 真正接进自己的工作流</p>
+                <p className="text-xs text-ink-muted mt-1">而不是只看工具介绍，可以了解 AI 内容系统咨询。</p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <CTA href="/services" label="查看 AI 咨询服务" variant="secondary" />
+                <CTA href="/tools/prompts" label="先看资料和工具" variant="ghost" />
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 justify-between">
+              <div>
+                <p className="text-sm font-medium text-ink">有相关的实用资料</p>
+                <p className="text-xs text-ink-muted mt-1">装修清单、预算模板、AI 提示词包，可免费领取。</p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <CTA href="/resources" label="去资料库看看" variant="secondary" />
+                <CTA href="/services" label="了解我提供的服务" variant="ghost" />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

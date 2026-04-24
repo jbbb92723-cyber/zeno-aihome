@@ -57,6 +57,10 @@ export default function HomePage() {
               领取资料
             </Link>
           </div>
+          <p className="text-xs text-ink-muted mt-5">
+            如果你已经有具体问题，或想让我直接帮你判断，可以
+            <Link href="/services" className="text-stone hover:underline underline-offset-2 decoration-stone/40 ml-0.5">查看服务</Link>。
+          </p>
         </Container>
       </section>
 

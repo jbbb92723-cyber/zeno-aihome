@@ -11,6 +11,29 @@ export const metadata: Metadata = {
     '赞诺提供装修报价单审核、装修预算咨询、真实居住派装修服务、AI 传统行业内容系统咨询。每项服务写清适合谁、不适合谁，不接所有咨询，只接能真正帮到的。',
 }
 
+const serviceRelatedArticles: Record<string, { label: string; href: string }[]> = {
+  'baojia-shenhe': [
+    { label: '报价单真正该怎么看', href: '/blog/baojia-dan-zenme-kan' },
+    { label: '装修预算为什么总超？', href: '/blog/zhuangxiu-yusuan-weishenme-zongchao' },
+    { label: '便宜的报价，往往是最贵的选择', href: '/blog/article-03-04' },
+  ],
+  'yusuan-zixun': [
+    { label: '装修预算为什么总超？', href: '/blog/zhuangxiu-yusuan-weishenme-zongchao' },
+    { label: '水电工程为什么总是超预算', href: '/blog/shuidian-gongcheng-zongchao-yusuan' },
+    { label: '装修完最后悔的五件事', href: '/blog/zhuangxiu-hou-hue-de-wu-jian' },
+  ],
+  'shi-zhu-pai-zhuangxiu': [
+    { label: '家不是样板间', href: '/blog/02-jia-bu-shi-yangban-jian' },
+    { label: '实住派装修，究竟反对什么', href: '/blog/article-01-03' },
+    { label: '真正耐住十年的装修，优先级是什么', href: '/blog/article-01-07' },
+  ],
+  'ai-neirong-xitong-zixun': [
+    { label: '为什么传统行业人必须认真学 AI', href: '/blog/article-05-01' },
+    { label: '内容资产，才是传统行业人的第二生产线', href: '/blog/article-05-02' },
+    { label: '我的内容系统是怎么建起来的', href: '/blog/neirong-xitong-jianqi' },
+  ],
+}
+
 export default function ServicesPage() {
   return (
     <>
@@ -129,6 +152,30 @@ export default function ServicesPage() {
                 <p className="text-sm text-ink-muted leading-relaxed">{service.contactNote}</p>
               </div>
 
+              {/* 相关文章 */}
+              {serviceRelatedArticles[service.slug] && (
+                <div className="px-6 py-4 border-t border-border">
+                  <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-1">
+                    先了解判断逻辑
+                  </p>
+                  <p className="text-xs text-ink-muted mb-3">
+                    如果你想先了解我的判断方式，再决定是否需要这项服务，可以先读这几篇：
+                  </p>
+                  <div className="space-y-1.5">
+                    {serviceRelatedArticles[service.slug].map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center gap-2 text-sm text-ink-muted hover:text-stone transition-colors"
+                      >
+                        <span className="text-stone/60">→</span>
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
             </div>
           ))}
         </div>
@@ -145,16 +192,16 @@ export default function ServicesPage() {
           <CTA href="/contact" label="查看联系方式" variant="secondary" />
         </div>
 
-        {/* 关联资料 */}
+        {/* 关联内容入口 */}
         <div className="mt-10">
           <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-4">
-            咨询前可以先看
+            更多参考
           </p>
           <div className="space-y-2">
             {[
-              { label: '装修预算为什么总超？', href: '/blog/zhuangxiu-yusuan-weishenme-zongchao' },
-              { label: '报价审核清单（资料）', href: '/resources' },
-              { label: '装修预算避坑资料包', href: '/resources' },
+              { label: '所有文章', href: '/blog' },
+              { label: '资料库（免费资料）', href: '/resources' },
+              { label: 'AI 提示词体验场', href: '/tools/prompts' },
             ].map((item) => (
               <Link
                 key={item.label}
