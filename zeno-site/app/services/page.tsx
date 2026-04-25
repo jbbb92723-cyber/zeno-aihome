@@ -6,9 +6,9 @@ import Container from '@/components/Container'
 import CTA from '@/components/CTA'
 
 export const metadata: Metadata = {
-  title: '服务',
+  title: '服务 — 不是卖套餐，是帮你做更清醒的判断',
   description:
-    '赞诺提供装修报价单审核、装修预算咨询、真实居住派装修服务、AI 传统行业内容系统咨询。每项服务写清适合谁、不适合谁，不接所有咨询，只接能真正帮到的。',
+    '赞诺提供装修报价审核、预算咨询、真实居住派装修服务，以及面向传统行业的 AI 内容资产系统搭建、个人 IP 咨询和一人公司工作流落地。每项服务写清适合谁、不适合谁。',
 }
 
 const serviceRelatedArticles: Record<string, { label: string; href: string }[]> = {
@@ -34,21 +34,51 @@ const serviceRelatedArticles: Record<string, { label: string; href: string }[]> 
   ],
 }
 
+// 装修用户服务 slugs
+const renovationSlugs = ['baojia-shenhe', 'yusuan-zixun', 'shi-zhu-pai-zhuangxiu']
+// AI / 传统行业服务 slugs
+const industrySlugs = ['ai-neirong-xitong-zixun']
+
+// 面向传统行业老板 / 创作者——暂无完整数据，用描述卡展示
+const industryExtras = [
+  {
+    title: '传统行业个人 IP 搭建',
+    desc: '你有手艺、有案例、有经验，但不知道怎么让人看到。从定位、内容结构到平台选择，帮你把经验变成可被搜到的资产。',
+  },
+  {
+    title: '一人公司内容工作流',
+    desc: '一个人怎么高效地持续输出？从选题到发布，用最少人力维持专业内容产出，建立长期复利。',
+  },
+  {
+    title: 'AI 工具落地咨询',
+    desc: '不是教你用哪个 AI 产品，而是帮你把具体业务流程拆解清楚，找到 AI 真正能替代的环节，降低试错成本。',
+  },
+]
+
 export default function ServicesPage() {
+  const renovationServices = services.filter((s) => renovationSlugs.includes(s.slug))
+  const industryServices = services.filter((s) => industrySlugs.includes(s.slug))
+
   return (
     <>
       <PageHero
         label="服务"
-        title="如果你需要更具体的帮助"
-        subtitle="文章可以给方向，但有些问题需要具体情况具体判断。这里是目前提供的服务，每一项都写清适合谁、不适合谁。"
+        title="不是卖套餐，是帮你做更清醒的判断。"
+        subtitle="无论是装修决策，还是传统行业的内容转型，我更关心的是：信息是否透明，判断是否清楚，长期是否值得。"
         size="content"
       />
 
       <Container size="content" className="py-section">
 
-        {/* 服务卡片列表 */}
+        {/* ───── A. 面向装修用户 ───── */}
+        <div className="mb-6">
+          <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-2">A</p>
+          <h2 className="text-lg font-semibold text-ink">面向装修用户</h2>
+          <p className="text-sm text-ink-muted mt-1">帮你看清报价、控住预算、做出更值得的决定。</p>
+        </div>
+
         <div className="space-y-10">
-          {services.map((service, index) => (
+          {renovationServices.map((service, index) => (
             <div key={service.id} className="border border-border overflow-hidden">
 
               {/* 卡片头部 */}
@@ -176,6 +206,92 @@ export default function ServicesPage() {
                 </div>
               )}
 
+            </div>
+          ))}
+        </div>
+
+        {/* ───── B. 面向传统行业老板 / 创作者 ───── */}
+        <div className="mt-16 mb-6">
+          <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-2">B</p>
+          <h2 className="text-lg font-semibold text-ink">面向传统行业老板 / 创作者</h2>
+          <p className="text-sm text-ink-muted mt-1">帮你把经验、判断和流程，整理成可复用的内容资产和工作系统。</p>
+        </div>
+
+        {/* 已有完整数据的服务 */}
+        <div className="space-y-10">
+          {industryServices.map((service, index) => (
+            <div key={service.id} className="border border-border overflow-hidden">
+              <div className="px-6 py-5 border-b border-border bg-surface-warm flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3 min-w-0">
+                  <span className="text-stone/30 text-xs font-mono shrink-0 mt-[3px]">
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-lg font-semibold text-ink leading-tight">{service.title}</h2>
+                    <p className="text-sm text-stone mt-1">{service.tagline}</p>
+                  </div>
+                </div>
+                <span className="shrink-0 self-start border border-stone/30 text-stone text-xs px-3 py-1 font-medium whitespace-nowrap">
+                  {service.price}
+                </span>
+              </div>
+              <div className="px-6 py-6 space-y-6">
+                <p className="text-sm text-ink leading-relaxed">{service.description}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div>
+                    <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-3">适合谁</p>
+                    <ul className="space-y-2">
+                      {service.forWho.map((item) => (
+                        <li key={item} className="flex items-start gap-2">
+                          <span className="text-stone text-xs shrink-0 mt-1">+</span>
+                          <span className="text-sm text-ink leading-relaxed">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-3">不适合谁</p>
+                    <ul className="space-y-2">
+                      {service.notForWho.map((item) => (
+                        <li key={item} className="flex items-start gap-2">
+                          <span className="text-ink-muted text-xs shrink-0 mt-1">—</span>
+                          <span className="text-sm text-ink-muted leading-relaxed">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-3">交付结果</p>
+                  <ul className="space-y-2">
+                    {service.iDeliver.map((item) => (
+                      <li key={item} className="flex items-start gap-2">
+                        <span className="text-stone text-xs shrink-0 mt-1">·</span>
+                        <span className="text-sm text-ink leading-relaxed">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <div className="border-l-2 border-stone-light pl-4">
+                  <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-1.5">服务边界</p>
+                  <p className="text-sm text-ink-muted leading-relaxed">{service.boundary}</p>
+                </div>
+              </div>
+              <div className="px-6 py-4 border-t border-border bg-stone-pale/20">
+                <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-1.5">咨询方式</p>
+                <p className="text-sm text-ink-muted leading-relaxed">{service.contactNote}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 即将推出的行业服务 */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+          {industryExtras.map((item) => (
+            <div key={item.title} className="border border-border bg-surface p-6">
+              <h3 className="text-sm font-semibold text-ink mb-3">{item.title}</h3>
+              <p className="text-xs text-ink-muted leading-relaxed mb-4">{item.desc}</p>
+              <span className="text-[0.65rem] text-stone border border-stone/30 px-2 py-0.5 uppercase tracking-wider">即将开放</span>
             </div>
           ))}
         </div>

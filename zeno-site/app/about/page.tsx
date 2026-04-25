@@ -58,6 +58,20 @@ export default function AboutPage() {
           </p>
         </section>
 
+        {/* ── 为什么用 AI ── */}
+        <section className="mb-12">
+          <h2 className="section-heading mb-5">为什么用 AI</h2>
+          <p className="text-base text-ink leading-[1.85]">
+            我不是技术出身的人，也不是只会讲概念的 AI 博主。
+            我从装修现场、客户沟通、报价审核和项目管理里走出来，
+            知道传统行业真正痛的不是"不努力"，而是信息太散、沟通太慢、经验太难沉淀。
+          </p>
+          <p className="text-base text-ink leading-[1.85] mt-4">
+            所以我用 AI 做的不是炫技，而是把客户问题、报价判断、施工经验、内容创作和服务流程，
+            整理成普通人也能使用的系统。
+          </p>
+        </section>
+
         {/* ── 我相信什么 ── */}
         <section className="mb-12">
           <h2 className="section-heading mb-5">我相信什么</h2>

@@ -5,15 +5,16 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import ThemeToggle from '@/components/ThemeToggle'
 
+// 导航重命名：体现战略定位，不只是装修站
 const cnNavLinks = [
-  { href: '/',          label: '首页' },
-  { href: '/about',     label: '关于我' },
-  { href: '/blog',      label: '文章' },
-  { href: '/topics',    label: '专题' },
-  { href: '/resources', label: '资料库' },
-  { href: '/services',  label: '服务' },
-  { href: '/tools/md2wechat', label: '排版工具' },
-  { href: '/contact',   label: '联系' },
+  { href: '/',                label: '首页' },
+  { href: '/topics',          label: '真实居住' },
+  { href: '/topics',          label: 'AI 生产力' },
+  { href: '/blog',            label: '行业拆解' },
+  { href: '/resources',       label: '资料库' },
+  { href: '/services',        label: '服务' },
+  { href: '/tools/md2wechat', label: '创作工作台' },
+  { href: '/about',           label: '关于 Zeno' },
 ]
 
 const enNavLinks = [
