@@ -65,8 +65,8 @@ export default function ForgotPasswordPage() {
 
         {emailDown && (
           <div className="mb-6 px-4 py-4 border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
-            <p className="font-medium mb-1">邮件服务未配置</p>
-            <p className="text-xs opacity-80">RESEND_API_KEY 尚未配置，无法发送验证码。请稍后重试。</p>
+            <p className="font-medium mb-1">邮件服务暂时不可用</p>
+            <p className="text-xs opacity-80">邮箱验证服务正在维护中，暂时无法发送验证码。请稍后再试。</p>
           </div>
         )}
         {error && (

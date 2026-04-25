@@ -268,7 +268,7 @@ export default function PublishClient({
             {converting ? '转换中…' : '站内排版转换'}
           </button>
           {!isApiConfigured && (
-            <span className="text-xs text-ink-muted">（MD2WECHAT_API_KEY 未配置）</span>
+            <span className="text-xs text-ink-muted">（排版服务暂未开放）</span>
           )}
         </div>
         <StatusMsg msg={convertMsg.text} type={convertMsg.type} />
@@ -295,7 +295,7 @@ export default function PublishClient({
 
           {!isImageConfigured ? (
             <p className="text-xs text-ink-muted">
-              VOLCENGINE_ARK_API_KEY 或 VOLCENGINE_IMAGE_MODEL 未配置，图片生成功能不可用。
+              图片生成服务暂未开放。
             </p>
           ) : (
             <div className="space-y-3">

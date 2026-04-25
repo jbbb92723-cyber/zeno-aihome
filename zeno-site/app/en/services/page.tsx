@@ -59,7 +59,7 @@ export default function EnServicesPage() {
 
         <div className="mt-10 flex flex-wrap gap-3">
           <Link
-            href="/contact"
+            href="mailto:zenoaihome@qq.com"
             className="text-sm font-medium text-paper bg-stone px-5 py-2.5 hover:bg-stone/85 transition-colors"
           >
             Contact Zeno
@@ -68,7 +68,7 @@ export default function EnServicesPage() {
             href="/services"
             className="text-sm font-medium text-stone border border-stone/30 px-5 py-2.5 hover:bg-stone-pale/50 transition-colors"
           >
-            View Chinese Services →
+            View Chinese version →
           </Link>
         </div>
       </Container>

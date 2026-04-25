@@ -22,7 +22,7 @@ function mapAuthError(error: string | null): string {
 
 function LoginForm() {
   const searchParams = useSearchParams()
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/account'
+  const callbackUrl = searchParams.get('callbackUrl') ?? '/en/account'
   const errorParam  = searchParams.get('error')
 
   const [email, setEmail]       = useState('')

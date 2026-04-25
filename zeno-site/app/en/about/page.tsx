@@ -67,16 +67,9 @@ export default function EnAboutPage() {
             <h2 className="text-base font-semibold text-ink mb-3">Contact</h2>
             <p className="text-sm text-ink-muted leading-relaxed mb-4">
               For international readers, the best way to reach me is by email.
-              For Chinese-speaking readers, visit the{' '}
-              <Link href="/contact" className="text-stone hover:underline underline-offset-2">
-                contact page
-              </Link>{' '}
-              on the Chinese site for WeChat and other options.
             </p>
             <ul className="space-y-2 text-sm text-ink-muted">
               <li>Email: zenoaihome@qq.com</li>
-              <li>YouTube: [To be added]</li>
-              <li>X (Twitter): [To be added]</li>
             </ul>
           </section>
 
@@ -89,7 +82,7 @@ export default function EnAboutPage() {
               Explore tools
             </Link>
             <Link
-              href="/en/articles"
+              href="/en/blog"
               className="text-sm font-medium text-stone border border-stone/40 px-4 py-2 hover:bg-stone-pale transition-colors"
             >
               Read selected essays

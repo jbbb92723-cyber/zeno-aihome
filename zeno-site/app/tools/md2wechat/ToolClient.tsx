@@ -277,7 +277,7 @@ export default function Md2WechatToolClient({
             )}
 
             {!isApiConfigured && (
-              <span className="text-xs text-amber-600">md2wechat API 待配置</span>
+              <span className="text-xs text-amber-600">排版服务暂未开放</span>
             )}
           </div>
 
@@ -328,7 +328,7 @@ export default function Md2WechatToolClient({
                 预估成本 ¥{imagePrice} / 张，实际费用以火山控制台为准。
               </p>
               {!isImageConfigured && (
-                <p className="text-xs text-amber-600">火山引擎图片生成 API 尚未配置</p>
+                <p className="text-xs text-amber-600">图片生成服务暂未开放</p>
               )}
               <div className="flex flex-wrap gap-2">
                 <button

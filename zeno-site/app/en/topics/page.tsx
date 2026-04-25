@@ -87,14 +87,14 @@ export default function EnTopicsPage() {
 
         <div className="mt-12 pt-8 border-t border-border">
           <p className="text-sm text-ink-muted leading-relaxed mb-4">
-            Detailed essays for each topic are available on the{' '}
+            English essays are added selectively — quality over quantity.
+            More detailed articles are available on the{' '}
             <Link
               href="/topics"
               className="text-stone hover:underline underline-offset-2"
             >
-              Chinese topics page
-            </Link>
-            . English essays are added selectively — quality over quantity.
+              Chinese version
+            </Link>.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link

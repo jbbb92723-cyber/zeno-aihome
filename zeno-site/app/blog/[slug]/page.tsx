@@ -8,9 +8,8 @@ import remarkGfm from 'remark-gfm'
 import { articles, getArticleBySlug, getRecentArticles } from '@/data/articles'
 import { getAlternateSlug } from '@/lib/i18n'
 import ArticleCard from '@/components/ArticleCard'
+import CopyLinkButton from '@/components/CopyLinkButton'
 import CTA from '@/components/CTA'
-import CommentSection from '@/components/CommentSection'
-import { auth } from '@/auth'
 
 interface Props {
   params: { slug: string }
@@ -49,9 +48,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ArticlePage({ params }: Props) {
   const article = getArticleBySlug(params.slug)
   if (!article) notFound()
-
-  const session = await auth()
-  const isLoggedIn = !!session?.user
 
   const formattedDate = new Date(article.date).toLocaleDateString('zh-CN', {
     year: 'numeric',
@@ -143,19 +139,36 @@ export default async function ArticlePage({ params }: Props) {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-ink">Zeno · 赞诺</p>
               <p className="text-xs text-ink-muted mt-1.5 leading-relaxed max-w-sm">
-                16 年装修从业经历。做过工地，盯过施工，做过方案，也带过团队。
-                现在把这些沉淀写出来——不追热点，只讲可用的判断。
+                16 年装修从业经历，从工地和客户沟通中走出来。
+                现在用 AI 把一线经验整理成普通人也能用的判断系统——不追热点，只讲真实。
               </p>
               <div className="flex flex-wrap gap-4 mt-3">
                 <Link href="/about" className="text-xs text-stone hover:underline underline-offset-2 decoration-stone-light">
                   了解更多 →
                 </Link>
                 <Link href="/contact" className="text-xs text-stone hover:underline underline-offset-2 decoration-stone-light">
-                  联系我交流
+                  联系 Zeno
                 </Link>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* 轻互动 */}
+        <div className="mt-10 pt-6 border-t border-border flex flex-wrap gap-3">
+          <CopyLinkButton />
+          <Link
+            href="/resources"
+            className="text-xs text-ink-muted border border-border px-3 py-1.5 hover:border-stone hover:text-stone transition-colors"
+          >
+            去资料库
+          </Link>
+          <Link
+            href="/contact"
+            className="text-xs text-ink-muted border border-border px-3 py-1.5 hover:border-stone hover:text-stone transition-colors"
+          >
+            联系 Zeno
+          </Link>
         </div>
       </article>
 
@@ -214,13 +227,6 @@ export default async function ArticlePage({ params }: Props) {
         </section>
       )}
 
-      {/* 评论区 */}
-      <CommentSection
-        articleSlug={article.slug}
-        isLoggedIn={isLoggedIn}
-        userName={session?.user?.name}
-        approvedComments={[]}
-      />
     </>
   )
 }

@@ -3,9 +3,9 @@ import Link from 'next/link'
 import Container from '@/components/Container'
 
 export const metadata: Metadata = {
-  title: 'Tools',
+  title: 'Creator Workspace',
   description:
-    'Practical tools and utilities from Zeno AI Home — prompt playground, acceptance checklist, budget planning, and writing workflow.',
+    'Practical tools from Zeno — prompt playground, writing workflow, and AI-assisted creation for traditional industry practitioners.',
 }
 
 const tools = [
@@ -18,28 +18,12 @@ const tools = [
     cta: 'Try the prompt playground',
   },
   {
-    title: 'Acceptance Checklist',
-    description:
-      'A field-friendly checklist for on-site review and practical handover. Built from 16+ years of renovation site experience — designed to be used at the job site, not just read at a desk.',
-    status: 'coming' as const,
-    href: null,
-    cta: null,
-  },
-  {
-    title: 'Budget Lite',
-    description:
-      'A practical budget planning utility for more durable home decisions. Helps you see where the money really goes — before you sign anything.',
-    status: 'coming' as const,
-    href: null,
-    cta: null,
-  },
-  {
     title: 'Writing & Publishing Workflow',
     description:
-      'A writing and publishing workflow entry for long-form content — Markdown to WeChat, newsletter-style publishing, and cross-platform distribution.',
+      'A writing and publishing workflow for long-form content — from Markdown drafting to formatted publishing.',
     status: 'available' as const,
     href: '/tools/md2wechat',
-    cta: 'Try the writing tool',
+    cta: 'Open writing tool',
   },
 ]
 
@@ -50,15 +34,14 @@ export default function EnToolsPage() {
       <div className="pt-12 sm:pt-16 pb-10 sm:pb-12 border-b border-border">
         <Container size="content">
           <p className="text-xs text-ink-faint font-semibold uppercase tracking-widest mb-4">
-            Tools
+            Creator Workspace
           </p>
           <h1 className="text-2xl font-semibold text-ink tracking-tight">
-            Practical Tools
+            Creator Workspace
           </h1>
           <p className="text-base text-ink-muted leading-[1.7] mt-4 max-w-2xl">
-            Tools and utilities from Zeno AI Home — built for practitioners,
-            not for show. Each tool solves a real problem I&apos;ve encountered
-            in renovation, writing, or AI-assisted work.
+            Turn experience into content, content into trust, trust into business.
+            Each tool here solves a real problem from renovation, writing, or AI-assisted work.
           </p>
         </Container>
       </div>
@@ -72,19 +55,12 @@ export default function EnToolsPage() {
               className="border border-border p-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4"
             >
               <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h2 className="text-base font-semibold text-ink">{tool.title}</h2>
-                  {tool.status === 'coming' && (
-                    <span className="text-[0.65rem] text-ink-faint uppercase tracking-widest border border-border px-2 py-0.5">
-                      Coming soon
-                    </span>
-                  )}
-                </div>
+                <h2 className="text-base font-semibold text-ink mb-2">{tool.title}</h2>
                 <p className="text-sm text-ink-muted leading-relaxed max-w-xl">
                   {tool.description}
                 </p>
               </div>
-              {tool.status === 'available' && tool.href && (
+              {tool.href && (
                 <Link
                   href={tool.href}
                   className="text-sm font-medium text-paper bg-stone px-4 py-2 hover:bg-stone/85 transition-colors whitespace-nowrap self-start"
@@ -106,8 +82,7 @@ export default function EnToolsPage() {
               build tools to look impressive. I build them because they save real time.
             </p>
             <p>
-              Tools are released incrementally. If something says &quot;coming soon,&quot; it means
-              I&apos;m still testing it in my own workflow before making it public.
+              Tools are released incrementally and tested in my own workflow first.
             </p>
           </div>
         </div>

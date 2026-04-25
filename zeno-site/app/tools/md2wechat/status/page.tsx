@@ -66,6 +66,21 @@ export default async function StatusPage() {
     },
   }
 
+  // 非管理员直接返回无权限提示
+  if (!admin) {
+    return (
+      <Container size="content" className="py-14 sm:py-18">
+        <div className="mb-10">
+          <p className="page-label mb-3">系统</p>
+          <h1 className="text-2xl font-semibold text-ink tracking-tight">无权限访问</h1>
+          <p className="text-sm text-ink-muted mt-3 leading-relaxed">
+            此页面仅限管理员查看。
+          </p>
+        </div>
+      </Container>
+    )
+  }
+
   return (
     <Container size="content" className="py-14 sm:py-18">
       <div className="mb-10">

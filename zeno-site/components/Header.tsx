@@ -5,25 +5,28 @@ import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 import ThemeToggle from '@/components/ThemeToggle'
 
-// 导航重命名：体现战略定位，不只是装修站
+// 中文导航：三条主线通过锚点/参数区分，避免同一页面
 const cnNavLinks = [
-  { href: '/',                label: '首页' },
-  { href: '/topics',          label: '真实居住' },
-  { href: '/topics',          label: 'AI 生产力' },
-  { href: '/blog',            label: '行业拆解' },
-  { href: '/resources',       label: '资料库' },
-  { href: '/services',        label: '服务' },
-  { href: '/tools/md2wechat', label: '创作工作台' },
-  { href: '/about',           label: '关于 Zeno' },
+  { href: '/',                          label: '首页' },
+  { href: '/topics#shi-zhu-pai-zhuangxiu', label: '真实居住' },
+  { href: '/topics#chuantong-hangyeren-zenme-yong-ai', label: 'AI 生产力' },
+  { href: '/blog',                      label: '行业拆解' },
+  { href: '/resources',                 label: '资料库' },
+  { href: '/services',                  label: '服务' },
+  { href: '/tools/md2wechat',           label: '创作工作台' },
+  { href: '/about',                     label: '关于 Zeno' },
 ]
 
+// 英文导航：与中文语义一一对应
 const enNavLinks = [
   { href: '/en',            label: 'Home' },
-  { href: '/en/about',      label: 'About' },
-  { href: '/en/blog',       label: 'Blog' },
-  { href: '/en/topics',     label: 'Topics' },
+  { href: '/en/topics#living-renovation', label: 'Real-Life Living' },
+  { href: '/en/topics#ai-upgrade',        label: 'AI Productivity' },
+  { href: '/en/blog',       label: 'Industry Notes' },
   { href: '/en/resources',  label: 'Resources' },
   { href: '/en/services',   label: 'Services' },
+  { href: '/en/tools',      label: 'Creator Workspace' },
+  { href: '/en/about',      label: 'About' },
 ]
 
 // 明确的路由映射（CN → EN，以及 EN → CN）
@@ -35,8 +38,8 @@ const CN_TO_EN: Record<string, string> = {
   '/topics':           '/en/topics',
   '/resources':        '/en/resources',
   '/services':         '/en/services',
-  '/contact':          '/en',
-  '/tools/md2wechat':  '/en',
+  '/contact':          '/en/about',
+  '/tools/md2wechat':  '/en/tools',
   '/login':            '/en/login',
   '/register':         '/en/register',
 }
@@ -48,6 +51,7 @@ const EN_TO_CN: Record<string, string> = {
   '/en/topics':     '/topics',
   '/en/resources':  '/resources',
   '/en/services':   '/services',
+  '/en/tools':      '/tools/md2wechat',
   '/en/login':      '/login',
   '/en/register':   '/register',
 }
@@ -86,7 +90,7 @@ export default function Header() {
   const isEn = pathname.startsWith('/en')
 
   const navLinks = isEn ? enNavLinks : cnNavLinks
-  const logoText = isEn ? 'Zeno' : 'Zeno 赞诺'
+  const logoText = isEn ? 'Zeno' : '赞诺 Zeno'
   const logoHref = isEn ? '/en' : '/'
   const loginLabel = isEn ? 'Log in' : '登录'
   const loginHref  = isEn ? '/en/login' : '/login'
@@ -94,10 +98,12 @@ export default function Header() {
   const langHref = getLangHref(pathname, isEn)
 
   const isActive = (href: string) => {
+    // 去掉锚点和查询参数后匹配路径
+    const base = href.split('#')[0].split('?')[0]
     if (isEn) {
-      return href === '/en' ? pathname === '/en' : pathname.startsWith(href)
+      return base === '/en' ? pathname === '/en' : pathname.startsWith(base)
     }
-    return href === '/' ? pathname === '/' : pathname.startsWith(href)
+    return base === '/' ? pathname === '/' : pathname.startsWith(base)
   }
 
   return (

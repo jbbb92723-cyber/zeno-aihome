@@ -17,11 +17,13 @@ const cnNavLinks = [
 
 const enNavLinks = [
   { href: '/en',            label: 'Home' },
-  { href: '/en/about',      label: 'About' },
-  { href: '/en/blog',       label: 'Blog' },
-  { href: '/en/topics',     label: 'Topics' },
+  { href: '/en/topics',     label: 'Real-Life Living' },
+  { href: '/en/topics',     label: 'AI Productivity' },
+  { href: '/en/blog',       label: 'Industry Notes' },
   { href: '/en/resources',  label: 'Resources' },
   { href: '/en/services',   label: 'Services' },
+  { href: '/en/tools',      label: 'Creator Workspace' },
+  { href: '/en/about',      label: 'About' },
 ]
 
 export default function Footer() {
@@ -45,12 +47,12 @@ export default function Footer() {
           {/* 品牌 + 定位 */}
           <div className="sm:col-span-1">
             <Link href={isEn ? '/en' : '/'} className="text-ink font-semibold text-[0.9375rem] hover:text-stone transition-colors">
-              {isEn ? 'Zeno' : 'Zeno 赞诺'}
+              {isEn ? 'Zeno' : '赞诺 Zeno'}
             </Link>
             <p className="mt-3 text-[0.8125rem] text-ink-muted leading-relaxed max-w-[220px]">
               {isEn
-                ? 'From renovation sites to real living, human judgment, and AI-enabled growth.'
-                : '从装修出发，聊居住、美学、人性、成长与 AI 时代的长期主义。'}
+                ? 'From renovation sites to AI-rebuilt trust, judgment, and efficiency in traditional industries.'
+                : '从装修现场出发，用 AI 重建传统行业的判断力、效率和信任。'}
             </p>
           </div>
 
@@ -109,7 +111,7 @@ export default function Footer() {
         {/* 版权栏 */}
         <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
           <p className="text-[0.75rem] text-ink-faint">
-            © {year} {isEn ? 'Zeno' : 'Zeno 赞诺'} · zenoaihome.com
+            © {year} {isEn ? 'Zeno AI Home' : '赞诺 Zeno'} · zenoaihome.com
           </p>
           <p className="text-[0.75rem] text-ink-faint">
             {isEn

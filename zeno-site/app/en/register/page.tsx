@@ -94,9 +94,7 @@ export default function EnRegisterPage() {
           <div className="mb-6 px-4 py-4 border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
             <p className="font-medium mb-1">Registration temporarily unavailable</p>
             <p className="text-xs opacity-80">
-              Email verification requires the Resend service. The admin has not yet configured{' '}
-              <code className="font-mono bg-amber-100 dark:bg-amber-900 px-1">RESEND_API_KEY</code>{' '}
-              in Vercel. Please try again later or{' '}
+              The email verification service is currently under maintenance. Please try again later or{' '}
               <Link href="/en/about" className="underline underline-offset-2">contact Zeno</Link>.
             </p>
           </div>

@@ -93,7 +93,7 @@ export default function RegisterPage() {
         {emailDown && (
           <div className="mb-6 px-4 py-4 border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
             <p className="font-medium mb-1">注册功能暂时不可用</p>
-            <p className="text-xs opacity-80">Exchange verification codes require the email service (Resend). The admin has not yet configured <code className="font-mono bg-amber-100 dark:bg-amber-900 px-1">RESEND_API_KEY</code> in Vercel. Please try again later.</p>
+            <p className="text-xs opacity-80">邮箱验证服务正在维护中，暂时无法发送验证码。请稍后再试。</p>
           </div>
         )}
         {error && (
