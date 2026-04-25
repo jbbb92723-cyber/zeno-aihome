@@ -14,7 +14,7 @@ function mapAuthError(error: string | null): string {
     case 'CredentialsSignin':      return '邮箱或密码不正确，请重试。'
     case 'OAuthSignin':            return 'Google 登录启动失败，请重试。'
     case 'OAuthCallback':          return 'Google 登录回调异常，请重试。'
-    case 'OAuthAccountNotLinked':  return '此 Google 账号与已有邮箱账号冲突，请用邮箱直接登录。'
+    case 'OAuthAccountNotLinked':  return '这个邮箱已经注册过账号。请先使用邮箱和密码登录。登录后可以在账号安全里绑定 Google。'
     case 'SessionRequired':        return '请先登录再访问该页面。'
     case 'Configuration':          return '服务端配置异常，请稍后重试或联系管理员。'
     default:                       return '登录出现问题，请重试。'
@@ -83,7 +83,7 @@ function LoginForm() {
 
   return (
     <Container size="content" className="py-section">
-      <div className="max-w-sm mx-auto">
+      <div className="max-w-[28rem] mx-auto">
         <div className="mb-10">
           <p className="page-label mb-3">登录</p>
           <h1 className="text-2xl font-semibold text-ink tracking-tight">登录 Zeno 赞诺</h1>
@@ -158,7 +158,7 @@ function LoginForm() {
         </button>
 
         {/* 底部链接 */}
-        <div className="mt-8 space-y-2 text-center">
+        <div className="mt-6 space-y-1.5 text-center">
           <p className="text-sm text-ink-muted">
             还没有账号？{' '}
             <Link href="/register" className="text-stone hover:underline underline-offset-2">
@@ -172,7 +172,7 @@ function LoginForm() {
           </p>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border">
+        <div className="mt-8 pt-5 border-t border-border">
           <p className="text-xs text-ink-faint leading-relaxed text-center">
             公开内容不需要登录。登录只是为了资料领取、评论等增强功能。
           </p>

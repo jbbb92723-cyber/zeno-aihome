@@ -32,23 +32,23 @@ const CN_TO_EN: Record<string, string> = {
   '/about':            '/en/about',
   '/blog':             '/en/blog',
   '/topics':           '/en/topics',
-  '/resources':        '/en/tools',
-  '/services':         '/en/about',
-  '/contact':          '/en/about',
-  '/tools/md2wechat':  '/en/tools',
+  '/resources':        '/en/resources',
+  '/services':         '/en/services',
+  '/contact':          '/en',
+  '/tools/md2wechat':  '/en',
   '/login':            '/en/login',
   '/register':         '/en/register',
 }
 
 const EN_TO_CN: Record<string, string> = {
-  '/en':           '/',
-  '/en/about':     '/about',
-  '/en/blog':      '/blog',
-  '/en/topics':    '/topics',
-  '/en/tools':     '/resources',
-  '/en/tools/prompts': '/tools/md2wechat',
-  '/en/login':     '/login',
-  '/en/register':  '/register',
+  '/en':            '/',
+  '/en/about':      '/about',
+  '/en/blog':       '/blog',
+  '/en/topics':     '/topics',
+  '/en/resources':  '/resources',
+  '/en/services':   '/services',
+  '/en/login':      '/login',
+  '/en/register':   '/register',
 }
 
 function getLangHref(pathname: string, isEn: boolean): string {

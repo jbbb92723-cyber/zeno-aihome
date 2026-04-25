@@ -169,6 +169,55 @@ From renovation to writing, from job sites to AI, this is what I keep verifying.
 
 If you're looking for your own long-term rhythm, start with one small action: write down what you're most anxious about right now, then write down the one step that would help you most in three months. Do that step first.`,
     },
+  },  {
+    articleId: '04',
+    en: {
+      slug: 'why-i-started-taking-ai-seriously',
+      title: 'Why I Started Taking AI Seriously',
+      excerpt: "I was skeptical of AI at first. What changed my mind wasn't the hype — it was the pain of spending most of my time on moving and repeating information instead of thinking and creating.",
+      category: 'AI for Practitioners',
+      tags: ['AI', 'workflow', 'efficiency', 'traditional industry', 'tools'],
+      coverAlt: 'Why I Started Taking AI Seriously — cover image',
+      content: `When I first encountered AI, I was skeptical.
+
+Every day my feed was filled with "this tool just disrupted everything" — after a while, the fatigue sets in. I don't come from a tech background. I've never believed in the "one prompt solves all" narrative. For me, any tool has to answer one question: does it actually help me do my real work better?
+
+What got me to take AI seriously wasn't the hype. It was the pain.
+
+During that period I was juggling renovation consultations, project reviews, and content writing. Information was scattered everywhere: client chats on one platform, site notes in a notebook, random ideas in voice memos, article outlines in yet another doc. Every day felt busy, but most of the time went to moving and repeating things — not to judgment and creation.
+
+I took some wrong turns first.
+
+Early on, I bookmarked dozens of "magic prompts." They looked impressive but rarely fit my situation. They could produce complete sentences, but nothing sounded like me. They could generate advice, but nothing matched my context. Eventually I realized the problem wasn't the tool — it was that I was treating it as an answer machine instead of a thinking partner.
+
+The turning point came when I started breaking my workflow apart.
+
+I split a complete task into stages: information gathering, structural organization, risk identification, expression and output, review and retention. Then I brought AI into only the stages where it actually helped.
+
+After a client consultation, I'd write my own core assessment first, then ask AI to run a "missed items check." When writing an article, I'd lock down the perspective and experience first, then use AI to sharpen the structure and readability. After a project wrapped, I'd feed the records into the system and generate a "reusable next time" checklist.
+
+The efficiency gains were secondary. What mattered more was that my thinking became steadier.
+
+People often ask me what the biggest change from learning AI has been.
+
+It's not "faster." It's "clearer."
+
+I used to carry a lot of experience in my head, but it was scattered. Now I can more easily turn experience into method, and method into reusable assets. For someone who came from job sites and fieldwork, this matters especially. We're naturally practice-oriented, but without systematization, experience struggles to compound.
+
+Of course, the boundaries have to be clear too.
+
+AI won't go on-site for you. It won't bear the consequences of a bad call. It won't build trust with an anxious client on your behalf. It's good at processing information, not at holding relationships. Good at generating options, not at making value judgments.
+
+So my stance on AI is simple: use it when it helps, don't worship it. Let it boost efficiency, but never outsource your thinking.
+
+When I say "taking AI seriously," what I really mean is taking my own growth seriously. In traditional industries, we've always lived on experience — and we always will. But the way we organize experience is changing. Whoever can structure their knowledge, clarify their expression, and systematize their tools will have more agency.
+
+This isn't career-change anxiety. It's not tech worship. It's a long-term professional discipline.
+
+Starting from renovation, I saw spaces and people. Looking further ahead, I see systems and eras. AI isn't a destination for me — it's a new tool on a longer road. What stays constant is the through line: in a complex reality, make choices that are as clear-eyed, responsible, and durably effective as possible.
+
+If you're in a traditional industry and want to put AI to practical use, start with one small workflow. You don't need to go big all at once. I'll keep sharing the workflow templates I've tested in the resource library — take what works and adapt it to your own rhythm.`,
+    },
   },
 ]
 
@@ -211,6 +260,13 @@ export function getLocalizedArticle(
 
 /** 获取某语言下所有可展示的文章（按日期降序） */
 export function getLocalizedArticles(locale: Locale): (Article & { localizedSlug: string })[] {
+  if (locale === 'en') {
+    // English: only show articles that have a real English translation
+    return translations
+      .map((t) => getLocalizedArticle(t.articleId, 'en'))
+      .filter((a): a is NonNullable<typeof a> => a !== null)
+      .sort((a, b) => b.date.localeCompare(a.date))
+  }
   return articles
     .map((a) => getLocalizedArticle(a.id, locale))
     .filter((a): a is NonNullable<typeof a> => a !== null)

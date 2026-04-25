@@ -81,7 +81,7 @@ export default function EnRegisterPage() {
 
   return (
     <Container size="content" className="py-section">
-      <div className="max-w-sm mx-auto">
+      <div className="max-w-[28rem] mx-auto">
         <div className="mb-10">
           <p className="page-label mb-3">Register</p>
           <h1 className="text-2xl font-semibold text-ink tracking-tight">Create an account</h1>

@@ -81,7 +81,7 @@ export default function RegisterPage() {
 
   return (
     <Container size="content" className="py-section">
-      <div className="max-w-sm mx-auto">
+      <div className="max-w-[28rem] mx-auto">
         <div className="mb-10">
           <p className="page-label mb-3">注册</p>
           <h1 className="text-2xl font-semibold text-ink tracking-tight">注册 Zeno 赞诺</h1>
