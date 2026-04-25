@@ -34,17 +34,23 @@ const authConfig: NextAuthConfig = {
         const password = credentials?.password as string
         if (!email || !password) return null
 
-        const user = await prisma.user.findUnique({ where: { email } })
-        if (!user || !user.passwordHash) return null
+        try {
+          const user = await prisma.user.findUnique({ where: { email } })
+          if (!user || !user.passwordHash) return null
 
-        const valid = await bcrypt.compare(password, user.passwordHash)
-        if (!valid) return null
+          const valid = await bcrypt.compare(password, user.passwordHash)
+          if (!valid) return null
 
-        return {
-          id:    user.id,
-          email: user.email,
-          name:  user.name,
-          image: user.image,
+          return {
+            id:    user.id,
+            email: user.email,
+            name:  user.name,
+            image: user.image,
+          }
+        } catch (err) {
+          // DB 连接失败时记录真实错误，不把 DB 错误误报成"密码错误"
+          console.error('[Auth] Credentials authorize error:', err)
+          return null
         }
       },
     }),

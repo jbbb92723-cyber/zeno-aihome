@@ -49,8 +49,20 @@ export async function POST(req: Request) {
     },
   })
 
-  await sendVerificationCode(email, code)
+  const sent = await sendVerificationCode(email, code)
+
+  if (!sent) {
+    // 邮件实际发送失败，删除刚创建的验证码记录，返回错误让前端正确提示
+    await prisma.verificationCode.deleteMany({
+      where: { email, type, consumedAt: null, expiresAt: { gt: new Date() } },
+    }).catch(() => {})
+    console.error('[send-code] Email delivery failed for:', email, '| type:', type)
+    return NextResponse.json(
+      { error: '验证码发送失败，请检查邮箱地址后重试，或联系管理员。' },
+      { status: 500 },
+    )
+  }
 
   // 无论邮箱是否存在，都返回统一提示
-  return NextResponse.json({ message: '如果邮箱有效，你将收到验证码。' })
+  return NextResponse.json({ message: '验证码已发送，请查收邮件（含垃圾箱）。' })
 }

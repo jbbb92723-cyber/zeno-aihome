@@ -51,12 +51,11 @@ export async function POST(req: Request) {
   // 检查邮箱是否已注册
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) {
-    // 不泄露邮箱是否存在，但验证码已消耗
     await prisma.verificationCode.update({
       where: { id: record.id },
       data: { consumedAt: new Date() },
     })
-    return NextResponse.json({ error: '注册失败，请检查输入' }, { status: 400 })
+    return NextResponse.json({ error: '此邮箱已注册，请直接登录，或使用"忘记密码"找回。' }, { status: 400 })
   }
 
   const passwordHash = await bcrypt.hash(password, 12)

@@ -1,6 +1,7 @@
 /**
  * GET /api/health
  * 快速检查数据库连接、邮件服务、管理员配置是否就绪
+ * 包含 Auth.js 所需的全部环境变量检查
  */
 
 import { NextResponse } from 'next/server'
@@ -15,31 +16,48 @@ export async function GET() {
     await prisma.$queryRaw`SELECT 1`
     checks.database = { ok: true, msg: '已连接' }
   } catch (e) {
-    checks.database = { ok: false, msg: `连接失败: ${(e as Error).message.slice(0, 80)}` }
+    checks.database = { ok: false, msg: `连接失败: ${(e as Error).message.slice(0, 120)}` }
   }
 
-  // 2. Email
+  // 2. Email (Resend)
   checks.email = isEmailConfigured()
     ? { ok: true, msg: 'RESEND_API_KEY 已配置' }
-    : { ok: false, msg: 'RESEND_API_KEY 未设置' }
+    : { ok: false, msg: 'RESEND_API_KEY 未设置 → 验证码发送功能不可用' }
 
   // 3. Auth secret
-  checks.auth = process.env.AUTH_SECRET
+  checks.auth_secret = process.env.AUTH_SECRET
     ? { ok: true, msg: 'AUTH_SECRET 已配置' }
-    : { ok: false, msg: 'AUTH_SECRET 未设置' }
+    : { ok: false, msg: 'AUTH_SECRET 未设置 → 所有登录将失败' }
 
-  // 4. Admin password
+  // 4. AUTH_URL / NEXTAUTH_URL
+  const authUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL
+  checks.auth_url = authUrl
+    ? { ok: true, msg: `${authUrl}` }
+    : { ok: false, msg: 'AUTH_URL 未设置 → Google OAuth 回调可能指向错误域名，建议设为 https://zenoaihome.com' }
+
+  // 5. Google OAuth
+  const googleId = process.env.AUTH_GOOGLE_ID ?? process.env.GOOGLE_CLIENT_ID
+  const googleSecret = process.env.AUTH_GOOGLE_SECRET ?? process.env.GOOGLE_CLIENT_SECRET
+  if (googleId && googleSecret) {
+    checks.google = { ok: true, msg: 'Google OAuth 已配置' }
+  } else {
+    const missing = [!googleId && 'AUTH_GOOGLE_ID', !googleSecret && 'AUTH_GOOGLE_SECRET'].filter(Boolean).join('、')
+    checks.google = { ok: false, msg: `未配置：${missing} → Google 登录不可用` }
+  }
+
+  // 6. Admin password
   checks.admin = process.env.ADMIN_PASSWORD
     ? { ok: true, msg: 'ADMIN_PASSWORD 已配置' }
     : { ok: false, msg: 'ADMIN_PASSWORD 未设置' }
 
-  // 5. Google OAuth (optional)
-  const googleId = process.env.AUTH_GOOGLE_ID ?? process.env.GOOGLE_CLIENT_ID
-  checks.google = googleId
-    ? { ok: true, msg: 'Google OAuth 已配置' }
-    : { ok: false, msg: '未配置（可选）' }
+  // 7. 关键 DB URL 提示（只检查是否存在 pgbouncer 参数，不暴露值）
+  const dbUrl = process.env.DATABASE_URL ?? ''
+  checks.database_url_pooler = dbUrl.includes('pgbouncer=true')
+    ? { ok: true, msg: 'DATABASE_URL 已使用 pgbouncer pooler（Vercel 必须）' }
+    : { ok: false, msg: 'DATABASE_URL 未包含 ?pgbouncer=true → Vercel 上邮箱登录可能超时' }
 
-  const allOk = ['database', 'email', 'auth', 'admin'].every((k) => checks[k].ok)
+  const critical = ['database', 'auth_secret']
+  const allOk = critical.every((k) => checks[k].ok)
 
   return NextResponse.json({ ok: allOk, checks }, { status: allOk ? 200 : 503 })
 }
