@@ -1,9 +1,7 @@
 /**
  * app/account/resources/page.tsx
  *
- * 我的资料页面
- * - 显示用户可访问的资料列表
- * - 第一版使用 mock 逻辑（未来接入 resource_downloads 表）
+ * 我的资料页面 — 真实读取 resource_claims 表
  */
 
 import type { Metadata } from 'next'
@@ -11,9 +9,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import Container from '@/components/Container'
-import { resources } from '@/data/resources'
-import { canAccessResource } from '@/lib/permissions'
-import type { AccessLevel } from '@/lib/permissions'
+import { prisma } from '@/lib/prisma'
 
 export const metadata: Metadata = {
   title: '已领资料',
@@ -27,15 +23,12 @@ export default async function AccountResourcesPage() {
     redirect('/login?callbackUrl=/account/resources')
   }
 
-  const user = session.user
+  const userId = session.user.id
 
-  // TODO（第二阶段）：从 resource_downloads 表查询用户实际下载记录
-  // 目前只展示用户「有权限访问」的资料，作为占位逻辑
-
-  // 将 data/resources.ts 中的资料数据添加默认 accessLevel（第一阶段兼容）
-  const accessibleResources = resources.filter((r) => {
-    const accessLevel = ((r as unknown as { accessLevel?: AccessLevel }).accessLevel) ?? 'login'
-    return canAccessResource(user, { accessLevel })
+  // 只查当前用户自己的领取记录，严格绑定 userId
+  const claims = await prisma.resourceClaim.findMany({
+    where: { userId },
+    orderBy: { claimedAt: 'desc' },
   })
 
   return (
@@ -49,63 +42,76 @@ export default async function AccountResourcesPage() {
           <span className="text-stone">已领资料</span>
         </nav>
 
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-ink tracking-tight">已领资料</h1>
-          <p className="text-sm text-ink-muted mt-2">
-            根据你的账号权限，以下资料你可以领取。
-          </p>
+        <div className="mb-8 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-ink tracking-tight">已领资料</h1>
+            <p className="text-sm text-ink-muted mt-2">你通过领取或兑换获得的资料记录。</p>
+          </div>
+          <Link
+            href="/account/redeem"
+            className="shrink-0 text-sm text-stone border border-stone/30 px-4 py-2 hover:bg-surface-warm transition-colors"
+          >
+            兑换码
+          </Link>
         </div>
 
-        {/* TODO 提示 */}
-        <div className="mb-8 px-4 py-3 border border-amber-200 bg-amber-50/60 text-xs text-amber-700 leading-relaxed">
-          <strong>开发说明：</strong>
-          当前版本展示「你有权限领取的资料」，不代表真实下载记录。
-          第二阶段接入数据库后，将显示实际领取历史。
-        </div>
-
-        {accessibleResources.length === 0 ? (
-          <div className="border border-border bg-surface p-8 text-center">
-            <p className="text-sm text-ink-muted mb-3">暂无可领取的资料</p>
-            <p className="text-xs text-ink-faint mb-6">
-              {user.role === 'user'
-                ? '登录用户可领取「登录领取」类资料。开通会员可解锁更多内容。'
-                : '暂时没有符合权限的资料。'}
+        {claims.length === 0 ? (
+          <div className="border border-border bg-surface p-10 text-center">
+            <p className="text-sm font-medium text-ink mb-2">你还没有领取资料</p>
+            <p className="text-xs text-ink-faint leading-relaxed max-w-xs mx-auto mb-6">
+              你可以去资料库领取免费资料，或通过兑换码解锁会员专属内容。
             </p>
-            <Link
-              href="/resources"
-              className="text-sm text-stone hover:underline underline-offset-2 decoration-stone-light"
-            >
-              去资料库看看 →
-            </Link>
+            <div className="flex justify-center gap-3">
+              <Link
+                href="/resources"
+                className="text-sm text-white bg-stone px-4 py-2 hover:bg-stone/85 transition-colors"
+              >
+                去资料库领取
+              </Link>
+              <Link
+                href="/account/redeem"
+                className="text-sm text-stone border border-stone/30 px-4 py-2 hover:bg-surface-warm transition-colors"
+              >
+                输入兑换码
+              </Link>
+            </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            {accessibleResources.map((resource) => (
-              <div
-                key={resource.id}
-                className="border border-border bg-surface p-5 flex items-center justify-between gap-4"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-ink leading-tight">{resource.title}</p>
-                  <p className="text-xs text-ink-muted mt-1 leading-relaxed">{resource.subtitle}</p>
+          <div className="divide-y divide-border border border-border">
+            {claims.map((claim) => (
+              <div key={claim.id} className="flex items-start justify-between gap-4 px-5 py-4 bg-surface">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-ink truncate">{claim.resourceTitle}</p>
+                  <p className="text-xs text-ink-faint mt-1">
+                    领取于 {new Date(claim.claimedAt).toLocaleDateString('zh-CN', {
+                      year: 'numeric', month: 'long', day: 'numeric',
+                    })}
+                  </p>
                 </div>
-                <Link
-                  href={`/resources#${resource.slug}`}
-                  className="shrink-0 text-xs text-stone hover:underline underline-offset-2 decoration-stone-light"
-                >
-                  领取方式 →
-                </Link>
+                {claim.resourceUrl ? (
+                  <a
+                    href={claim.resourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 text-xs text-stone border border-stone/30 px-3 py-1.5 hover:bg-surface-warm transition-colors"
+                  >
+                    查看 / 下载
+                  </a>
+                ) : (
+                  <span className="shrink-0 text-xs text-ink-faint border border-border px-3 py-1.5">
+                    链接待补充
+                  </span>
+                )}
               </div>
             ))}
           </div>
         )}
 
-        {/* 底部说明 */}
-        <div className="mt-10 pt-6 border-t border-border">
-          <p className="text-xs text-ink-faint leading-relaxed">
-            资料领取方式目前通过公众号「Zeno AI装修笔记」回复关键词获取。
-            后续将支持直接在账号中心下载。
-          </p>
+        <div className="mt-8 flex justify-between items-center text-xs text-ink-faint">
+          <span>共 {claims.length} 条记录</span>
+          <Link href="/resources" className="hover:text-stone transition-colors">
+            去资料库看更多 →
+          </Link>
         </div>
 
       </div>

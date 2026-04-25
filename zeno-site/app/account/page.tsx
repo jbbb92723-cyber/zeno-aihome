@@ -289,6 +289,20 @@ export default async function AccountPage() {
           </div>
         </section>
 
+        {/* ── 7. 兑换码入口 ─────────────────────────────────── */}
+        <section className="border border-border bg-surface p-6">
+          <p className="text-[0.65rem] text-ink-faint font-semibold uppercase tracking-widest mb-4">兑换码</p>
+          <p className="text-xs text-ink-muted leading-relaxed mb-4">
+            通过兑换码可以激活会员权益、解锁资料或领取优惠券。
+          </p>
+          <Link
+            href="/account/redeem"
+            className="inline-block text-xs text-stone border border-stone/30 px-4 py-2 hover:bg-stone-pale/50 transition-colors"
+          >
+            输入兑换码 →
+          </Link>
+        </section>
+
         {/* ── 退出登录 ──────────────────────────────────────── */}
         <div className="pt-2 pb-8">
           <form
