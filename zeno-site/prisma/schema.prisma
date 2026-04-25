@@ -24,9 +24,14 @@ model User {
 
   accounts Account[]
   sessions Session[]
-  membership     Membership?
-  resourceClaims ResourceClaim[]
-  serviceRequests ServiceRequest[]
+  membership        Membership?
+  resourceClaims    ResourceClaim[]
+  serviceRequests   ServiceRequest[]
+  orders            Order[]
+  couponClaims      CouponClaim[]
+  couponUsages      CouponUsage[]
+  redeemCodeUsages  RedeemCodeUsage[]
+  checkins          Checkin[]
 
   @@map("users")
 }
@@ -141,4 +146,213 @@ model ServiceRequest {
 
   @@index([userId])
   @@map("service_requests")
+}
+
+// ─── 商品 ────────────────────────────────────────────────────
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // digital_resource | membership | consulting | service | course
+  price       Int      // 分
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders Order[]
+
+  @@map("products")
+}
+
+// ─── 订单 ────────────────────────────────────────────────────
+model Order {
+  id             String    @id @default(cuid())
+  userId         String?
+  orderNo        String    @unique
+  productId      String?
+  productName    String
+  productType    String
+  amount         Int       // 原价（分）
+  discountAmount Int       @default(0)
+  paidAmount     Int
+  status         String    @default("pending") // pending|paid|processing|completed|cancelled|refunded
+  paymentMethod  String?   // wechat|alipay|manual
+  couponId       String?
+  redeemCodeId   String?
+  source         String?
+  remark         String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  paidAt         DateTime?
+  completedAt    DateTime?
+
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  product  Product?  @relation(fields: [productId], references: [id])
+  payments Payment[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+// ─── 支付记录 ────────────────────────────────────────────────
+model Payment {
+  id            String   @id @default(cuid())
+  orderId       String
+  amount        Int
+  method        String   // wechat|alipay|manual
+  status        String   @default("pending") // pending|success|failed
+  transactionId String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@map("payments")
+}
+
+// ─── 优惠券 ──────────────────────────────────────────────────
+model Coupon {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  name      String
+  type      String    // fixed | percent
+  value     Int       // 固定减（分）或折扣（0-100 表示折扣百分比）
+  minAmount Int       @default(0)
+  maxUses   Int?      // null = 不限
+  usedCount Int       @default(0)
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  claims CouponClaim[]
+  usages CouponUsage[]
+
+  @@map("coupons")
+}
+
+model CouponClaim {
+  id        String   @id @default(cuid())
+  couponId  String
+  userId    String
+  claimedAt DateTime @default(now())
+
+  coupon Coupon @relation(fields: [couponId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([couponId, userId])
+  @@map("coupon_claims")
+}
+
+model CouponUsage {
+  id       String   @id @default(cuid())
+  couponId String
+  userId   String
+  orderId  String?
+  usedAt   DateTime @default(now())
+
+  coupon Coupon @relation(fields: [couponId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("coupon_usages")
+}
+
+// ─── 兑换码 ──────────────────────────────────────────────────
+model RedeemCode {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  type      String    // membership | resource | coupon | service_discount
+  value     String?   // plan name / resource id / coupon code / discount amount
+  maxUses   Int       @default(1)
+  usedCount Int       @default(0)
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+  note      String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  usages RedeemCodeUsage[]
+
+  @@map("redeem_codes")
+}
+
+model RedeemCodeUsage {
+  id           String   @id @default(cuid())
+  redeemCodeId String
+  userId       String
+  usedAt       DateTime @default(now())
+
+  redeemCode RedeemCode @relation(fields: [redeemCodeId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([redeemCodeId, userId])
+  @@map("redeem_code_usages")
+}
+
+// ─── 行为事件 ────────────────────────────────────────────────
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  event     String
+  path      String?
+  referrer  String?
+  metadata  Json?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([event])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("analytics_events")
+}
+
+// ─── 每日汇总指标 ─────────────────────────────────────────────
+model DailyMetric {
+  id              String   @id @default(cuid())
+  date            DateTime @unique
+  pageViews       Int      @default(0)
+  uniqueUsers     Int      @default(0)
+  newUsers        Int      @default(0)
+  logins          Int      @default(0)
+  resourceClaims  Int      @default(0)
+  serviceRequests Int      @default(0)
+  orderCount      Int      @default(0)
+  orderRevenue    Int      @default(0) // 分
+  memberCount     Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("daily_metrics")
+}
+
+// ─── 签到打卡 ────────────────────────────────────────────────
+model Checkin {
+  id        String   @id @default(cuid())
+  userId    String
+  checkedAt DateTime @default(now())
+  note      String?
+  streak    Int      @default(1)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([checkedAt])
+  @@map("checkins")
+}
+
+// ─── 后台操作日志 ─────────────────────────────────────────────
+model AdminLog {
+  id        String   @id @default(cuid())
+  action    String
+  target    String?
+  detail    Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("admin_logs")
 }

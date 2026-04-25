@@ -75,6 +75,10 @@ function getLangHref(pathname: string, isEn: boolean): string {
 export default function Header() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+
+  // 管理后台使用独立布局，隐藏全站导航
+  if (pathname.startsWith('/admin')) return null
+
   const isEn = pathname.startsWith('/en')
 
   const navLinks = isEn ? enNavLinks : cnNavLinks

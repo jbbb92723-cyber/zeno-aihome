@@ -25,6 +25,10 @@ const enNavLinks = [
 export default function Footer() {
   const year = new Date().getFullYear()
   const pathname = usePathname()
+
+  // 管理后台使用独立布局，隐藏全站 Footer
+  if (pathname.startsWith('/admin')) return null
+
   const isEn = pathname.startsWith('/en')
 
   const navLinks = isEn ? enNavLinks : cnNavLinks
