@@ -56,6 +56,8 @@ export async function POST(req: Request) {
     await prisma.verificationCode.deleteMany({
       where: { email, type, consumedAt: null, expiresAt: { gt: new Date() } },
     }).catch(() => {})
+    console.error('[send-code] RESEND_API_KEY exists:', !!process.env.RESEND_API_KEY)
+    console.error('[send-code] EMAIL_FROM:', process.env.EMAIL_FROM)
     console.error('[send-code] Email delivery failed for:', email, '| type:', type)
     return NextResponse.json(
       { error: '验证码发送失败，请检查邮箱地址后重试，或联系管理员。' },

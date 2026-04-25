@@ -1,30 +1,34 @@
 /**
  * lib/email.ts — Resend 邮件验证码发送
+ *
+ * 注意：Resend 客户端在每次函数调用时从 process.env 读取，避免 Next.js
+ * 模块缓存导致顶层初始化时 env 未就绪的问题。
  */
 
 import { Resend } from 'resend'
 
-const resendKey = process.env.RESEND_API_KEY
-const emailFrom = process.env.EMAIL_FROM ?? 'Zeno AI Home <noreply@zenoaihome.com>'
-
-let resend: Resend | null = null
-if (resendKey) {
-  resend = new Resend(resendKey)
-} else {
-  console.error('[Email] RESEND_API_KEY is not set — email sending disabled')
-}
-
+/**
+ * 判断 Resend API Key 是否已配置（在请求时读取，而非模块加载时）
+ */
 export function isEmailConfigured(): boolean {
-  return !!resendKey
+  return !!process.env.RESEND_API_KEY
 }
 
 export async function sendVerificationCode(email: string, code: string): Promise<boolean> {
-  if (!resend) {
-    console.error('[Email] Resend client not initialized (RESEND_API_KEY missing)')
+  const resendKey = process.env.RESEND_API_KEY
+  const emailFrom = process.env.EMAIL_FROM ?? 'Zeno AI Home <noreply@zenoaihome.com>'
+
+  // 诊断日志 —— 可在 Vercel Functions Logs 中看到
+  console.log('[Email] RESEND_API_KEY exists:', !!resendKey)
+  console.log('[Email] EMAIL_FROM:', emailFrom)
+  console.log('[Email] to:', email)
+
+  if (!resendKey) {
+    console.error('[Email] RESEND_API_KEY is not set at request time')
     return false
   }
 
-  console.log(`[Email] Attempting to send verification code to: ${email} | from: ${emailFrom}`)
+  const resend = new Resend(resendKey)
 
   try {
     const { data, error } = await resend.emails.send({
@@ -50,12 +54,7 @@ export async function sendVerificationCode(email: string, code: string): Promise
     })
 
     if (error) {
-      // 输出完整错误，便于在 Vercel Functions Logs 中诊断
-      console.error('[Email] Resend API error:', JSON.stringify({
-        name:       (error as { name?: string }).name,
-        message:    error.message,
-        statusCode: (error as { statusCode?: number }).statusCode,
-      }))
+      console.error('[Email] Resend API error:', JSON.stringify(error, null, 2))
       console.error('[Email] from:', emailFrom, '| to:', email)
       return false
     }
