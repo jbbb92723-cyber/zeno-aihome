@@ -1,56 +1,93 @@
 /**
  * app/api/orders/route.ts
  *
- * 订单 API 路由（占位）
- *
- * 第一阶段：不处理真实支付，只做结构占位
- *
- * TODO（第二阶段）：
- * 1. 接入 Stripe / 微信支付 / 支付宝
- * 2. 创建支付意图（Payment Intent）
- * 3. 支付成功后更新 orders 表和 memberships 表
- * 4. 通过 webhook 而非前端回调确认支付成功
+ * POST /api/orders — 创建待付款订单
+ * GET  /api/orders — 当前用户订单列表
  */
 
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
+import { prisma } from '@/lib/prisma'
+import { getProductById } from '@/data/products'
+import { z } from 'zod'
+
+const createOrderSchema = z.object({
+  productId:     z.string().min(1).max(64),
+  paymentMethod: z.enum(['wechat', 'alipay']).default('wechat'),
+  couponCode:    z.string().optional(),
+})
+
+/** 生成订单号：ZENO-YYYYMMDD-XXXX */
+function genOrderNo(): string {
+  const d = new Date()
+  const date = d.getFullYear().toString() +
+    String(d.getMonth() + 1).padStart(2, '0') +
+    String(d.getDate()).padStart(2, '0')
+  const rand = Math.random().toString(36).slice(2, 6).toUpperCase()
+  return `ZENO-${date}-${rand}`
+}
 
 export async function POST(request: NextRequest) {
   const session = await auth()
-  if (!session?.user) {
-    return NextResponse.json({ message: '请先登录。' }, { status: 401 })
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: '请先登录' }, { status: 401 })
   }
 
-  // TODO（第二阶段）：
-  // 1. 解析 productType 和 productId
-  // 2. 查询产品价格
-  // 3. 调用支付平台创建订单
-  // 4. 在 orders 表插入 pending 记录
-  // 5. 返回支付跳转链接或支付参数
+  const body = await request.json().catch(() => null)
+  const parsed = createOrderSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ error: '参数错误' }, { status: 400 })
+  }
 
-  return NextResponse.json(
-    {
-      message: '支付系统正在建设中，暂不支持在线支付。',
-      // TODO: paymentUrl: '...'
+  const { productId, paymentMethod } = parsed.data
+  const product = getProductById(productId)
+  if (!product) {
+    return NextResponse.json({ error: '商品不存在或已下架' }, { status: 404 })
+  }
+
+  const orderNo = genOrderNo()
+
+  const order = await prisma.order.create({
+    data: {
+      userId:        session.user.id,
+      orderNo,
+      productId,
+      productName:   product.name,
+      productType:   product.type,
+      amount:        product.price,
+      discountAmount: 0,
+      paidAmount:    product.price,
+      status:        'pending',
+      paymentMethod,
+      source:        'web',
+      // remark 存储权益 value，grantEntitlement 读取
+      remark:        product.value,
     },
-    { status: 503 },
-  )
+  })
+
+  return NextResponse.json({ orderNo: order.orderNo }, { status: 201 })
 }
 
 export async function GET(request: NextRequest) {
   const session = await auth()
-  if (!session?.user) {
-    return NextResponse.json({ message: '请先登录。' }, { status: 401 })
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: '请先登录' }, { status: 401 })
   }
 
-  // TODO（第二阶段）：从 orders 表查询当前用户的订单列表
-  /*
-  const orders = await db.order.findMany({
-    where: { userId: session.user.id },
+  const orders = await prisma.order.findMany({
+    where:   { userId: session.user.id },
     orderBy: { createdAt: 'desc' },
+    take:    20,
+    select:  {
+      orderNo:     true,
+      productName: true,
+      paidAmount:  true,
+      status:      true,
+      createdAt:   true,
+      paidAt:      true,
+    },
   })
-  return NextResponse.json({ orders })
-  */
 
-  return NextResponse.json({ orders: [] })
+  return NextResponse.json({ orders })
 }
+

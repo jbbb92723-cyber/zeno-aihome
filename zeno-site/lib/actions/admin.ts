@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { isAdminUser } from '@/lib/admin'
 import { prisma } from '@/lib/prisma'
+import { grantEntitlement } from '@/lib/entitlements'
 
 // ─── 权限守卫 ────────────────────────────────────────────────
 async function requireAdmin() {
@@ -133,4 +134,32 @@ export async function createCoupon(data: {
 
   await prisma.adminLog.create({ data: { action: 'create_coupon', detail: { code: data.code } } })
   revalidatePath('/admin/coupons')
+}
+
+// ─── 支付确认（手动付款流） ────────────────────────────────────
+export async function confirmPayment(orderId: string) {
+  await requireAdmin()
+
+  const order = await prisma.order.findUnique({ where: { id: orderId } })
+  if (!order) throw new Error('Order not found')
+
+  const allowedStatuses = ['pending', 'pending_confirmation']
+  if (!allowedStatuses.includes(order.status)) {
+    throw new Error(`订单状态为 ${order.status}，无法确认`)
+  }
+
+  // 先更新为 paid，grantEntitlement 内部会改为 completed
+  await prisma.order.update({
+    where: { id: orderId },
+    data:  { status: 'paid', paidAt: new Date() },
+  })
+
+  // 开通权益 + 改为 completed
+  await grantEntitlement(orderId)
+
+  await prisma.adminLog.create({
+    data: { action: 'confirm_payment', target: orderId },
+  })
+
+  revalidatePath('/admin/orders')
 }

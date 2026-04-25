@@ -8,11 +8,29 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendCodeSchema } from '@/lib/validations'
 import { sendVerificationCode, isEmailConfigured } from '@/lib/email'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 import bcrypt from 'bcryptjs'
 
 export async function POST(req: Request) {
   if (!isEmailConfigured()) {
     return NextResponse.json({ error: '邮箱服务待配置' }, { status: 503 })
+  }
+
+  // ── IP 限速 ────────────────────────────────────────────────
+  const ip = getClientIp(req)
+  const perMinute = checkRateLimit(`send-code:1m:${ip}`, 3, 60_000)
+  if (!perMinute.allowed) {
+    return NextResponse.json(
+      { error: '请求过于频繁，请稍后再试（1 分钟内最多 3 次）' },
+      { status: 429 },
+    )
+  }
+  const perHour = checkRateLimit(`send-code:1h:${ip}`, 20, 3_600_000)
+  if (!perHour.allowed) {
+    return NextResponse.json(
+      { error: '今日发送次数已达上限，请 1 小时后再试' },
+      { status: 429 },
+    )
   }
 
   const body = await req.json().catch(() => null)

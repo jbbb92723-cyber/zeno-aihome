@@ -1,21 +1,27 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
-import { updateOrderStatus } from '@/lib/actions/admin'
+import { updateOrderStatus, confirmPayment } from '@/lib/actions/admin'
 import Link from 'next/link'
 
 export const metadata: Metadata = { title: '订单管理 · Admin' }
 
 const ORDER_STATUS_LABEL: Record<string, string> = {
-  pending:    '待付款',
-  paid:       '已付款',
-  processing: '处理中',
-  completed:  '已完成',
-  cancelled:  '已取消',
-  refunded:   '已退款',
+  pending:               '待付款',
+  pending_confirmation:  '待确认',
+  paid:                  '已付款',
+  processing:            '处理中',
+  completed:             '已完成',
+  cancelled:             '已取消',
+  refunded:              '已退款',
 }
 const STATUS_COLOR: Record<string, string> = {
-  pending: 'text-[#A09890]', paid: 'text-[#C4A882]', processing: 'text-[#C4A882]',
-  completed: 'text-green-400', cancelled: 'text-[#706860]', refunded: 'text-[#706860]',
+  pending:              'text-[#A09890]',
+  pending_confirmation: 'text-[#C4A882]',
+  paid:                 'text-[#C4A882]',
+  processing:           'text-[#C4A882]',
+  completed:            'text-green-400',
+  cancelled:            'text-[#706860]',
+  refunded:             'text-[#706860]',
 }
 
 const PAGE_SIZE = 30
@@ -116,6 +122,20 @@ export default async function OrdersPage({
                   {o.createdAt.toLocaleDateString('zh-CN')}
                 </td>
                 <td className="px-3 py-3">
+                  {/* 快速确认按钮（待确认状态） */}
+                  {(o.status === 'pending_confirmation' || o.status === 'pending') && (
+                    <form action={async () => {
+                      'use server'
+                      await confirmPayment(o.id)
+                    }} className="mb-2">
+                      <button
+                        type="submit"
+                        className="text-xs bg-[#C4A882] text-[#1C1A17] font-semibold px-3 py-1 hover:bg-[#D4B892] transition-colors"
+                      >
+                        确认已付款
+                      </button>
+                    </form>
+                  )}
                   <form action={async (formData: FormData) => {
                     'use server'
                     const status = formData.get('status') as string

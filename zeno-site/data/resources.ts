@@ -1,4 +1,6 @@
-export type ResourceAccessLevel = 'public' | 'login' | 'member' | 'paid' | 'admin'
+export type ResourceAccessLevel = 'public' | 'login' | 'content_member' | 'creator_member' | 'admin'
+// 向后兼容旧值（'member' → 'content_member', 'paid' → 'creator_member'）
+export type ResourceAccessLevelLegacy = ResourceAccessLevel | 'member' | 'paid'
 
 export interface Resource {
   id: string

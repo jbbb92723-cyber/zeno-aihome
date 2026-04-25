@@ -1,20 +1,21 @@
 /**
  * POST /api/admin/login
- * POST /api/admin/logout
  */
 
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { verifyAdminPassword, generateAdminToken } from '@/lib/admin'
+import { checkRateLimit, getClientIp } from '@/lib/rateLimit'
 
 export async function POST(req: Request) {
-  const url = new URL(req.url)
-  const isLogout = url.searchParams.get('action') === 'logout'
-
-  if (isLogout) {
-    const cookieStore = await cookies()
-    cookieStore.delete('admin_session')
-    return NextResponse.json({ message: 'ok' })
+  // ── IP 暴力破解防护：5 次失败锁定 10 分钟 ──────────────────
+  const ip = getClientIp(req)
+  const limiter = checkRateLimit(`admin-login:${ip}`, 5, 10 * 60_000)
+  if (!limiter.allowed) {
+    return NextResponse.json(
+      { error: `登录尝试过多，请 10 分钟后重试` },
+      { status: 429 },
+    )
   }
 
   const body = await req.json().catch(() => null)
