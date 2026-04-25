@@ -24,6 +24,9 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  membership     Membership?
+  resourceClaims ResourceClaim[]
+  serviceRequests ServiceRequest[]
 
   @@map("users")
 }
@@ -87,4 +90,55 @@ model VerificationCode {
 
   @@index([email, type])
   @@map("verification_codes")
+}
+
+// ─── 会员资格 ───────────────────────────────────────────────
+model Membership {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  plan      String    @default("free")   // free | creator
+  status    String    @default("active") // active | expired | cancelled
+  startedAt DateTime  @default(now())
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("memberships")
+}
+
+// ─── 资料领取记录 ───────────────────────────────────────────
+model ResourceClaim {
+  id            String   @id @default(cuid())
+  userId        String
+  resourceId    String
+  resourceTitle String
+  resourceUrl   String?
+  claimedAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("resource_claims")
+}
+
+// ─── 服务申请记录 ───────────────────────────────────────────
+model ServiceRequest {
+  id          String   @id @default(cuid())
+  userId      String?
+  serviceType String
+  name        String?
+  phone       String?
+  wechat      String?
+  email       String?
+  message     String?
+  status      String   @default("submitted") // submitted | reviewing | completed | rejected
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@map("service_requests")
 }
