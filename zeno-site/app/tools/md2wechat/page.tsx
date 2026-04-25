@@ -160,13 +160,19 @@ export default async function Md2WechatPage() {
         </section>
       )}
 
-      {/* ── 配置状态入口 ── */}
-      <section className="mb-10 pt-4 border-t border-border">
+      {/* ── 创作工作台入口 ── */}
+      <section className="mb-10 pt-4 border-t border-border flex items-center gap-6">
+        <Link
+          href="/tools/publish"
+          className="text-xs text-stone hover:text-stone/80 transition-colors"
+        >
+          → 公众号创作工作台（含回流链接注入）
+        </Link>
         <Link
           href="/tools/md2wechat/status"
-          className="text-xs text-ink-faint hover:text-ink-muted transition-colors underline underline-offset-2"
+          className="text-xs text-ink-faint hover:text-ink-muted transition-colors"
         >
-          查看 API 配置状态 →
+          查看 API 配置状态
         </Link>
       </section>
 

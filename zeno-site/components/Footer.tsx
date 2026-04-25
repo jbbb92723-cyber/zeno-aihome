@@ -11,6 +11,7 @@ const cnNavLinks = [
   { href: '/resources', label: '资料库' },
   { href: '/services', label: '服务' },
   { href: '/tools/md2wechat', label: '排版工具' },
+  { href: '/tools/publish', label: '创作工作台' },
   { href: '/contact', label: '联系' },
 ]
 
