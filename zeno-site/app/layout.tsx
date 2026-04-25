@@ -48,6 +48,12 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  alternates: {
+    languages: {
+      'zh-CN': 'https://zenoaihome.com',
+      en: 'https://zenoaihome.com/en',
+    },
+  },
 }
 
 export default function RootLayout({

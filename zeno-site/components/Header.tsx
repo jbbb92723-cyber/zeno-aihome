@@ -17,10 +17,12 @@ const cnNavLinks = [
 ]
 
 const enNavLinks = [
-  { href: '/en',        label: 'Home' },
-  { href: '/en/about',  label: 'About' },
-  { href: '/en/tools',  label: 'Tools' },
-  { href: '/en/topics', label: 'Topics' },
+  { href: '/en',            label: 'Home' },
+  { href: '/en/about',      label: 'About' },
+  { href: '/en/blog',       label: 'Blog' },
+  { href: '/en/topics',     label: 'Topics' },
+  { href: '/en/resources',  label: 'Resources' },
+  { href: '/en/services',   label: 'Services' },
 ]
 
 // 明确的路由映射（CN → EN，以及 EN → CN）
@@ -28,7 +30,7 @@ const enNavLinks = [
 const CN_TO_EN: Record<string, string> = {
   '/':                 '/en',
   '/about':            '/en/about',
-  '/blog':             '/en/articles',
+  '/blog':             '/en/blog',
   '/topics':           '/en/topics',
   '/resources':        '/en/tools',
   '/services':         '/en/about',
@@ -41,7 +43,7 @@ const CN_TO_EN: Record<string, string> = {
 const EN_TO_CN: Record<string, string> = {
   '/en':           '/',
   '/en/about':     '/about',
-  '/en/articles':  '/blog',
+  '/en/blog':      '/blog',
   '/en/topics':    '/topics',
   '/en/tools':     '/resources',
   '/en/tools/prompts': '/tools/md2wechat',
@@ -54,6 +56,7 @@ function getLangHref(pathname: string, isEn: boolean): string {
     // EN → CN
     if (EN_TO_CN[pathname]) return EN_TO_CN[pathname]
     // 对于动态路由（如 /en/articles/slug），兜底到 /blog
+    if (pathname.startsWith('/en/blog/')) return '/blog'
     if (pathname.startsWith('/en/articles/')) return '/blog'
     // 去掉 /en 前缀，若有对应中文页则跳转
     const cnPath = pathname.replace(/^\/en/, '') || '/'
@@ -66,7 +69,7 @@ function getLangHref(pathname: string, isEn: boolean): string {
     // CN → EN
     if (CN_TO_EN[pathname]) return CN_TO_EN[pathname]
     // 对于动态路由（如 /blog/slug），兜底到 /en/articles
-    if (pathname.startsWith('/blog/')) return '/en/articles'
+    if (pathname.startsWith('/blog/')) return '/en/blog'
     // 其他未知路由兜底到 /en
     return '/en'
   }

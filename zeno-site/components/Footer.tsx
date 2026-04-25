@@ -16,10 +16,12 @@ const cnNavLinks = [
 ]
 
 const enNavLinks = [
-  { href: '/en', label: 'Home' },
-  { href: '/en/about', label: 'About' },
-  { href: '/en/tools', label: 'Tools' },
-  { href: '/en/topics', label: 'Topics' },
+  { href: '/en',            label: 'Home' },
+  { href: '/en/about',      label: 'About' },
+  { href: '/en/blog',       label: 'Blog' },
+  { href: '/en/topics',     label: 'Topics' },
+  { href: '/en/resources',  label: 'Resources' },
+  { href: '/en/services',   label: 'Services' },
 ]
 
 export default function Footer() {

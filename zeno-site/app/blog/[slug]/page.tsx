@@ -6,6 +6,7 @@ import Avatar from '@/components/Avatar'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { articles, getArticleBySlug, getRecentArticles } from '@/data/articles'
+import { getAlternateSlug } from '@/lib/i18n'
 import ArticleCard from '@/components/ArticleCard'
 import CTA from '@/components/CTA'
 import CommentSection from '@/components/CommentSection'
@@ -22,6 +23,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = getArticleBySlug(params.slug)
   if (!article) return {}
+  const enSlug = getAlternateSlug(article.id, 'en')
   return {
     title: article.title,
     description: article.excerpt,
@@ -30,8 +32,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: article.title,
       description: article.excerpt,
       type: 'article',
+      locale: 'zh_CN',
       publishedTime: article.date,
       tags: article.tags,
+    },
+    alternates: {
+      canonical: `https://zenoaihome.com/blog/${article.slug}`,
+      languages: {
+        'zh-CN': `https://zenoaihome.com/blog/${article.slug}`,
+        ...(enSlug ? { en: `https://zenoaihome.com/en/blog/${enSlug}` } : {}),
+      },
     },
   }
 }
