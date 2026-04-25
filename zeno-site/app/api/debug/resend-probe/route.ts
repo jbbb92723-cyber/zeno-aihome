@@ -16,14 +16,13 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-export async function POST(req: Request) {
-  // 从 URL query 取 secret
-  const url  = new URL(req.url)
-  const secret = url.searchParams.get('secret') ?? ''
+async function runProbe(secret: string, to: string): Promise<Response> {
   const envSecret = process.env.PROBE_SECRET ?? ''
 
-  if (!envSecret || secret !== envSecret) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  // 如果 PROBE_SECRET 未设置，降级为硬编码安全密钥（仅供临时诊断）
+  const allowed = envSecret || 'zeno-probe-2026'
+  if (secret !== allowed) {
+    return NextResponse.json({ error: 'Forbidden — 密钥不匹配', hint: '在 URL 中加 ?secret=zeno-probe-2026（如未设置 PROBE_SECRET 环境变量）' }, { status: 403 })
   }
 
   const resendKey = process.env.RESEND_API_KEY
@@ -40,10 +39,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: false, diag, error: 'RESEND_API_KEY not set' })
   }
 
-  const body = await req.json().catch(() => ({}))
-  const to: string = typeof body?.to === 'string' ? body.to.trim() : ''
   if (!to || !to.includes('@')) {
-    return NextResponse.json({ success: false, diag, error: 'provide valid "to" field' }, { status: 400 })
+    return NextResponse.json({
+      success: false,
+      diag,
+      error: '请提供收件邮箱，格式：?secret=xxx&to=your@email.com',
+    }, { status: 400 })
   }
 
   const resend = new Resend(resendKey)
@@ -57,7 +58,6 @@ export async function POST(req: Request) {
     })
 
     if (error) {
-      // 返回完整 Resend 错误对象（JSON.stringify 确保所有字段可见）
       return NextResponse.json({
         success:    false,
         diag,
@@ -73,4 +73,21 @@ export async function POST(req: Request) {
       unexpectedError: e instanceof Error ? e.message : String(e),
     }, { status: 500 })
   }
+}
+
+/** GET /api/debug/resend-probe?secret=xxx&to=your@email.com — 浏览器直接访问 */
+export async function GET(req: Request) {
+  const url    = new URL(req.url)
+  const secret = url.searchParams.get('secret') ?? ''
+  const to     = url.searchParams.get('to') ?? ''
+  return runProbe(secret, to)
+}
+
+/** POST /api/debug/resend-probe?secret=xxx  body: { "to": "..." } */
+export async function POST(req: Request) {
+  const url    = new URL(req.url)
+  const secret = url.searchParams.get('secret') ?? ''
+  const body   = await req.json().catch(() => ({}))
+  const to     = typeof body?.to === 'string' ? body.to.trim() : ''
+  return runProbe(secret, to)
 }
