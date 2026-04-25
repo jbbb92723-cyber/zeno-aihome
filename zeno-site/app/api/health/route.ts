@@ -20,9 +20,19 @@ export async function GET() {
   }
 
   // 2. Email (Resend)
-  checks.email = isEmailConfigured()
-    ? { ok: true, msg: 'RESEND_API_KEY 已配置' }
-    : { ok: false, msg: 'RESEND_API_KEY 未设置 → 验证码发送功能不可用' }
+  const emailFrom = process.env.EMAIL_FROM
+  const resendOk = isEmailConfigured()
+  if (!resendOk) {
+    checks.email = { ok: false, msg: 'RESEND_API_KEY 未设置 → 验证码发送功能不可用' }
+  } else if (!emailFrom) {
+    checks.email = { ok: false, msg: 'RESEND_API_KEY 已配置，但 EMAIL_FROM 未设置（将使用默认值）' }
+  } else {
+    // 验证 EMAIL_FROM 格式合理（含 @）
+    const hasAt = emailFrom.includes('@')
+    checks.email = hasAt
+      ? { ok: true,  msg: `RESEND_API_KEY 已配置 | EMAIL_FROM: ${emailFrom}` }
+      : { ok: false, msg: `EMAIL_FROM 格式可能有误: "${emailFrom}"` }
+  }
 
   // 3. Auth secret
   checks.auth_secret = process.env.AUTH_SECRET

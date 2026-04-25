@@ -10,6 +10,8 @@ const emailFrom = process.env.EMAIL_FROM ?? 'Zeno AI Home <noreply@zenoaihome.co
 let resend: Resend | null = null
 if (resendKey) {
   resend = new Resend(resendKey)
+} else {
+  console.error('[Email] RESEND_API_KEY is not set — email sending disabled')
 }
 
 export function isEmailConfigured(): boolean {
@@ -18,12 +20,14 @@ export function isEmailConfigured(): boolean {
 
 export async function sendVerificationCode(email: string, code: string): Promise<boolean> {
   if (!resend) {
-    console.error('[Email] Resend not configured')
+    console.error('[Email] Resend client not initialized (RESEND_API_KEY missing)')
     return false
   }
 
+  console.log(`[Email] Attempting to send verification code to: ${email} | from: ${emailFrom}`)
+
   try {
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from:    emailFrom,
       to:      email,
       subject: 'Zeno AI Home 验证码',
@@ -46,12 +50,20 @@ export async function sendVerificationCode(email: string, code: string): Promise
     })
 
     if (error) {
-      console.error('[Email] Send failed:', error.message)
+      // 输出完整错误，便于在 Vercel Functions Logs 中诊断
+      console.error('[Email] Resend API error:', JSON.stringify({
+        name:       (error as { name?: string }).name,
+        message:    error.message,
+        statusCode: (error as { statusCode?: number }).statusCode,
+      }))
+      console.error('[Email] from:', emailFrom, '| to:', email)
       return false
     }
+
+    console.log('[Email] Sent successfully, Resend id:', data?.id)
     return true
   } catch (e) {
-    console.error('[Email] Send error:', e)
+    console.error('[Email] Unexpected send error:', e)
     return false
   }
 }
